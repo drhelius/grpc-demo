@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-user
+    app.openshift.io/vcs-ref: ${USER_VERSION}
+  labels:
+    app: user
+    version: ${USER_VERSION}
+    app.kubernetes.io/name: user
+    app.kubernetes.io/version: ${USER_VERSION}
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: ${APP_NAME}
+    app.openshift.io/runtime: golang
+  name: user-${USER_VERSION}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user
+      version: ${USER_VERSION}
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: user
+        version: ${USER_VERSION}
+    spec:
+      containers:
+      - image: ${USER_IMAGE}:${USER_VERSION}
+        imagePullPolicy: Always
+        name: user
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: ${CPU_LIMIT}
+            memory: ${MEMORY_LIMIT}Mi
+          requests:
+            cpu: ${CPU_REQUEST}
+            memory: ${MEMORY_REQUEST}Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30

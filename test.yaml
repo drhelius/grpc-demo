@@ -1,0 +1,27 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: user
+spec:
+  gateways:
+  - mesh
+  hosts:
+  - user
+  http:
+  - route:
+    - destination:
+        host: user
+        subset: version-1-0-0
+      weight: 100
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: user-version
+spec:
+  host: user
+  subsets:
+  - name: version-1-0-0
+    labels:
+      version: v1.0.0

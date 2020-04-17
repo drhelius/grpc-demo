@@ -1,0 +1,507 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: grpc-demo
+metadata:
+  annotations:
+    description: A group of interconnected GRPC demo services written in Go.
+    iconClass: icon-go-gopher
+    openshift.io/display-name: Interconnected GRPC demo services
+    openshift.io/documentation-url: https://github.com/drhelius/grpc-demo
+    openshift.io/provider-display-name: Ignacio Sánchez
+    openshift.io/support-url: https://twitter.com/drhelius
+    tags: grpc,demo
+  labels:
+    template: grpc-demo
+  name: grpc-demo
+objects:
+
+###############################################################################
+# Account service
+###############################################################################
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      app.openshift.io/connects-to: user,order
+      app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-account
+      app.openshift.io/vcs-ref: ${ACCOUNT_VERSION}
+    labels:
+      app: account
+      version: ${ACCOUNT_VERSION}
+      app.kubernetes.io/name: account
+      app.kubernetes.io/version: ${ACCOUNT_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+      app.openshift.io/runtime: golang
+    name: account-${ACCOUNT_VERSION}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: account
+        version: ${ACCOUNT_VERSION}
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
+        labels:
+          app: account
+          version: ${ACCOUNT_VERSION}
+      spec:
+        containers:
+        - image: ${ACCOUNT_IMAGE}:${ACCOUNT_VERSION}
+          imagePullPolicy: Always
+          name: account
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}Mi
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: account
+      version: ${ACCOUNT_VERSION}
+      app.kubernetes.io/name: account
+      app.kubernetes.io/version: ${ACCOUNT_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: account
+  spec:
+    ports:
+    - name: grpc
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: account
+      version: ${ACCOUNT_VERSION}
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: account
+      version: ${ACCOUNT_VERSION}
+      app.kubernetes.io/name: account
+      app.kubernetes.io/version: ${ACCOUNT_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: account
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: account
+      weight: 100
+
+###############################################################################
+# Order service
+###############################################################################
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      app.openshift.io/connects-to: product
+      app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-order
+      app.openshift.io/vcs-ref: ${ORDER_VERSION}
+    labels:
+      app: order
+      version: ${ORDER_VERSION}
+      app.kubernetes.io/name: order
+      app.kubernetes.io/version: ${ORDER_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+      app.openshift.io/runtime: golang
+    name: order-${ORDER_VERSION}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: order
+        version: ${ORDER_VERSION}
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
+        labels:
+          app: order
+          version: ${ORDER_VERSION}
+      spec:
+        containers:
+        - image: ${ORDER_IMAGE}:${ORDER_VERSION}
+          imagePullPolicy: Always
+          name: order
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}Mi
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: order
+      version: ${ORDER_VERSION}
+      app.kubernetes.io/name: order
+      app.kubernetes.io/version: ${ORDER_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: order
+  spec:
+    ports:
+    - name: grpc
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: order
+      version: ${ORDER_VERSION}
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: order
+      version: ${ORDER_VERSION}
+      app.kubernetes.io/name: order
+      app.kubernetes.io/version: ${ORDER_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: order
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: order
+      weight: 100
+
+###############################################################################
+# Product service
+###############################################################################
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-product
+      app.openshift.io/vcs-ref: ${PRODUCT_VERSION}
+    labels:
+      app: product
+      version: ${PRODUCT_VERSION}
+      app.kubernetes.io/name: product
+      app.kubernetes.io/version: ${PRODUCT_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+      app.openshift.io/runtime: golang
+    name: product-${PRODUCT_VERSION}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: product
+        version: ${PRODUCT_VERSION}
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
+        labels:
+          app: product
+          version: ${PRODUCT_VERSION}
+      spec:
+        containers:
+        - image: ${PRODUCT_IMAGE}:${PRODUCT_VERSION}
+          imagePullPolicy: Always
+          name: product
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}Mi
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: product
+      version: ${PRODUCT_VERSION}
+      app.kubernetes.io/name: product
+      app.kubernetes.io/version: ${PRODUCT_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: product
+  spec:
+    ports:
+    - name: grpc
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: product
+      version: ${PRODUCT_VERSION}
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: product
+      version: ${PRODUCT_VERSION}
+      app.kubernetes.io/name: product
+      app.kubernetes.io/version: ${PRODUCT_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: product
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: product
+      weight: 100
+
+###############################################################################
+# User service
+###############################################################################
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-user
+      app.openshift.io/vcs-ref: ${USER_VERSION}
+    labels:
+      app: user
+      version: ${USER_VERSION}
+      app.kubernetes.io/name: user
+      app.kubernetes.io/version: ${USER_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+      app.openshift.io/runtime: golang
+    name: user-${USER_VERSION}
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: user
+        version: ${USER_VERSION}
+    template:
+      metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
+        labels:
+          app: user
+          version: ${USER_VERSION}
+      spec:
+        containers:
+        - image: ${USER_IMAGE}:${USER_VERSION}
+          imagePullPolicy: Always
+          name: user
+          ports:
+          - containerPort: 5000
+            protocol: TCP
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: ${CPU_LIMIT}
+              memory: ${MEMORY_LIMIT}Mi
+            requests:
+              cpu: ${CPU_REQUEST}
+              memory: ${MEMORY_REQUEST}Mi
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: user
+      version: ${USER_VERSION}
+      app.kubernetes.io/name: user
+      app.kubernetes.io/version: ${USER_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: user
+  spec:
+    ports:
+    - name: grpc
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: user
+      version: ${USER_VERSION}
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: user
+      version: ${USER_VERSION}
+      app.kubernetes.io/name: user
+      app.kubernetes.io/version: ${USER_VERSION}
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: user
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: user
+      weight: 100
+
+###############################################################################
+# Parameters
+###############################################################################
+
+parameters:
+- description: Sets the Application name.
+  name: APP_NAME
+  displayName: Application name
+  value: grpc-demo
+- description: Sets the Account Service image.
+  name: ACCOUNT_IMAGE
+  displayName: Account Service image
+  value: quay.io/isanchez/grpc-demo-account
+- description: Sets the Account Service version.
+  name: ACCOUNT_VERSION
+  displayName: Account Service version
+  value: v1.0.0
+- description: Specifies how many instances of the Account Service to create in the cluster.
+  name: ACCOUNT_REPLICAS
+  displayName: Account Service replicas
+  value: "1"
+- description: Sets the Order Service image.
+  name: ORDER_IMAGE
+  displayName: Order Service image
+  value: quay.io/isanchez/grpc-demo-order
+- description: Sets the Order Service version.
+  name: ORDER_VERSION
+  displayName: Order Service version
+  value: v1.0.0
+- description: Specifies how many instances of the Order Service to create in the cluster.
+  name: ORDER_REPLICAS
+  displayName: Order Service replicas
+  value: "1"
+- description: Sets the Product Service image.
+  name: PRODUCT_IMAGE
+  displayName: Product Service image
+  value: quay.io/isanchez/grpc-demo-product
+- description: Sets the Product Service version.
+  name: PRODUCT_VERSION
+  displayName: Product Service version
+  value: v1.0.0
+- description: Specifies how many instances of the Product Service to create in the cluster.
+  name: PRODUCT_REPLICAS
+  displayName: Product Service replicas
+  value: "1"
+- description: Sets the User Service image.
+  name: USER_IMAGE
+  displayName: User Service image
+  value: quay.io/isanchez/grpc-demo-user
+- description: Sets the User Service version.
+  name: USER_VERSION
+  displayName: User Service version
+  value: v1.0.0
+- description: Specifies how many instances of the User Service to create in the cluster.
+  name: USER_REPLICAS
+  displayName: User Service replicas
+  value: "1"
+- description: Sets the memory limit in Mi, available to each service.
+  name: MEMORY_LIMIT
+  displayName: Service Memory Limit
+  value: "200"
+- description: Sets the initial memory request in Mi for each service.
+  name: MEMORY_REQUEST
+  displayName: Service Memory Request
+  value: "100"
+- description: Sets the CPU limit, available to each service.
+  name: CPU_LIMIT
+  displayName: Service CPU Limit
+  value: "0.5"
+- description: Sets the initial CPU request for each service.
+  name: CPU_REQUEST
+  displayName: Service CPU Request
+  value: "0.1"

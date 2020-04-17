@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: account
+  namespace: istio-system
+spec:
+  host: account-grpc-demo-istio-system.apps.geardome.duckdns.org
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
