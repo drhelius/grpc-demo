@@ -81,9 +81,7 @@ objects:
   metadata:
     labels:
       app: account
-      version: ${ACCOUNT_VERSION}
       app.kubernetes.io/name: account
-      app.kubernetes.io/version: ${ACCOUNT_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
     name: account
@@ -103,6 +101,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
   metadata:
+    labels:
+      app: account
+      app.kubernetes.io/name: account
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: account
   spec:
     gateways:
@@ -119,6 +122,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: DestinationRule
   metadata:
+    labels:
+      app: account
+      app.kubernetes.io/name: account
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: account
   spec:
     host: account
@@ -126,6 +134,48 @@ objects:
     - name: current-version
       labels:
         version: ${ACCOUNT_VERSION}
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: Gateway
+  metadata:
+    labels:
+      app: account
+      app.kubernetes.io/name: account
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: account
+  spec:
+    selector:
+      istio: ingressgateway
+    servers:
+    - hosts:
+      - account-grpc-demo-istio-system.apps.geardome.duckdns.org
+      port:
+        name: http2
+        number: 80
+        protocol: HTTP2
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
+  metadata:
+    labels:
+      app: account
+      app.kubernetes.io/name: account
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
+    name: account-gw
+  spec:
+    hosts:
+    - account-grpc-demo-istio-system.apps.geardome.duckdns.org
+    gateways:
+    - account
+    http:
+    - route:
+      - destination:
+          host: account
+          port:
+            number: 8080
+        weight: 100
 
 ###############################################################################
 # Order service
@@ -192,9 +242,7 @@ objects:
   metadata:
     labels:
       app: order
-      version: ${ORDER_VERSION}
       app.kubernetes.io/name: order
-      app.kubernetes.io/version: ${ORDER_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
     name: order
@@ -214,6 +262,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
   metadata:
+    labels:
+      app: order
+      app.kubernetes.io/name: order
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: order
   spec:
     gateways:
@@ -230,6 +283,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: DestinationRule
   metadata:
+    labels:
+      app: order
+      app.kubernetes.io/name: order
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: order
   spec:
     host: order
@@ -303,9 +361,7 @@ objects:
   metadata:
     labels:
       app: product
-      version: ${PRODUCT_VERSION}
       app.kubernetes.io/name: product
-      app.kubernetes.io/version: ${PRODUCT_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
     name: product
@@ -325,6 +381,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
   metadata:
+    labels:
+      app: product
+      app.kubernetes.io/name: product
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: product
   spec:
     gateways:
@@ -341,6 +402,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: DestinationRule
   metadata:
+    labels:
+      app: product
+      app.kubernetes.io/name: product
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: product
   spec:
     host: product
@@ -414,9 +480,7 @@ objects:
   metadata:
     labels:
       app: user
-      version: ${USER_VERSION}
       app.kubernetes.io/name: user
-      app.kubernetes.io/version: ${USER_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
     name: user
@@ -436,6 +500,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: VirtualService
   metadata:
+    labels:
+      app: user
+      app.kubernetes.io/name: user
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: user
   spec:
     gateways:
@@ -452,6 +521,11 @@ objects:
 - apiVersion: networking.istio.io/v1alpha3
   kind: DestinationRule
   metadata:
+    labels:
+      app: user
+      app.kubernetes.io/name: user
+      app.kubernetes.io/component: service
+      app.kubernetes.io/part-of: ${APP_NAME}
     name: user
   spec:
     host: user
@@ -459,6 +533,85 @@ objects:
     - name: current-version
       labels:
         version: ${USER_VERSION}
+
+###############################################################################
+# httpbin
+###############################################################################
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: httpbin
+  spec:
+    type: ExternalName
+    externalName: httpbin.org
+    ports:
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: Gateway
+  metadata:
+    name: istio-egressgateway
+  spec:
+    selector:
+      istio: egressgateway
+    servers:
+    - port:
+        number: 443
+        name: tls
+        protocol: TLS
+      hosts:
+      - httpbin.grpc-demo.svc.cluster.local
+      tls:
+        mode: PASSTHROUGH
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: DestinationRule
+  metadata:
+    name: egressgateway-for-httpbin
+  spec:
+    host: istio-egressgateway.istio-system.svc.cluster.local
+    subsets:
+    - name: httpbin
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
+  metadata:
+    name: direct-httpbin-through-egress-gateway
+  spec:
+    hosts:
+    - httpbin
+    gateways:
+    - mesh
+    - istio-egressgateway
+    tls:
+    - match:
+      - gateways:
+        - mesh
+        port: 443
+        sni_hosts:
+        - httpbin
+      route:
+      - destination:
+          host: istio-egressgateway.istio-system.svc.cluster.local
+          subset: httpbin
+          port:
+            number: 443
+    - match:
+      - gateways:
+        - istio-egressgateway
+        port: 443
+        sni_hosts:
+        - httpbin
+      route:
+      - destination:
+          host: httpbin
+          port:
+            number: 443
+        weight: 100
 
 ###############################################################################
 # Parameters
