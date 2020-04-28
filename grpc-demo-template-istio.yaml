@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: grpc-demo
+  template: grpc-demo-istio
 metadata:
   annotations:
-    description: A group of interconnected GRPC demo services written in Go.
+    description: A group of interconnected GRPC demo services written in Go running on Istio.
     iconClass: icon-go-gopher
-    openshift.io/display-name: Interconnected GRPC demo services
+    openshift.io/display-name: Interconnected GRPC demo services for Istio.
     openshift.io/documentation-url: https://github.com/drhelius/grpc-demo
     openshift.io/provider-display-name: Ignacio Sánchez
     openshift.io/support-url: https://twitter.com/drhelius
     tags: grpc,demo
   labels:
     template: grpc-demo
-  name: grpc-demo
+  name: grpc-demo-istio
 objects:
 
 ###############################################################################
@@ -43,6 +43,8 @@ objects:
         version: ${ACCOUNT_VERSION}
     template:
       metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
         labels:
           app: account
           version: ${ACCOUNT_VERSION}
@@ -97,26 +99,33 @@ objects:
       targetPort: 8080
     selector:
       app: account
-      version: ${ACCOUNT_VERSION}
 
-- apiVersion: route.openshift.io/v1
-  kind: Route
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
   metadata:
-    labels:
-      app: account
-      version: ${ACCOUNT_VERSION}
-      app.kubernetes.io/name: account
-      app.kubernetes.io/version: ${ACCOUNT_VERSION}
-      app.kubernetes.io/component: service
-      app.kubernetes.io/part-of: ${APP_NAME}
     name: account
   spec:
-    port:
-      targetPort: http
-    to:
-      kind: Service
-      name: account
-      weight: 100
+    gateways:
+    - mesh
+    hosts:
+    - account
+    http:
+    - route:
+      - destination:
+          host: account
+          subset: current-version
+        weight: 100
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: DestinationRule
+  metadata:
+    name: account
+  spec:
+    host: account
+    subsets:
+    - name: current-version
+      labels:
+        version: ${ACCOUNT_VERSION}
 
 ###############################################################################
 # Order service
@@ -145,6 +154,8 @@ objects:
         version: ${ORDER_VERSION}
     template:
       metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
         labels:
           app: order
           version: ${ORDER_VERSION}
@@ -199,26 +210,33 @@ objects:
       targetPort: 8080
     selector:
       app: order
-      version: ${ORDER_VERSION}
 
-- apiVersion: route.openshift.io/v1
-  kind: Route
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
   metadata:
-    labels:
-      app: order
-      version: ${ORDER_VERSION}
-      app.kubernetes.io/name: order
-      app.kubernetes.io/version: ${ORDER_VERSION}
-      app.kubernetes.io/component: service
-      app.kubernetes.io/part-of: ${APP_NAME}
     name: order
   spec:
-    port:
-      targetPort: http
-    to:
-      kind: Service
-      name: order
-      weight: 100
+    gateways:
+    - mesh
+    hosts:
+    - order
+    http:
+    - route:
+      - destination:
+          host: order
+          subset: current-version
+        weight: 100
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: DestinationRule
+  metadata:
+    name: order
+  spec:
+    host: order
+    subsets:
+    - name: current-version
+      labels:
+        version: ${ORDER_VERSION}
 
 ###############################################################################
 # Product service
@@ -247,6 +265,8 @@ objects:
         version: ${PRODUCT_VERSION}
     template:
       metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
         labels:
           app: product
           version: ${PRODUCT_VERSION}
@@ -301,26 +321,33 @@ objects:
       targetPort: 8080
     selector:
       app: product
-      version: ${PRODUCT_VERSION}
 
-- apiVersion: route.openshift.io/v1
-  kind: Route
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
   metadata:
-    labels:
-      app: product
-      version: ${PRODUCT_VERSION}
-      app.kubernetes.io/name: product
-      app.kubernetes.io/version: ${PRODUCT_VERSION}
-      app.kubernetes.io/component: service
-      app.kubernetes.io/part-of: ${APP_NAME}
     name: product
   spec:
-    port:
-      targetPort: http
-    to:
-      kind: Service
-      name: product
-      weight: 100
+    gateways:
+    - mesh
+    hosts:
+    - product
+    http:
+    - route:
+      - destination:
+          host: product
+          subset: current-version
+        weight: 100
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: DestinationRule
+  metadata:
+    name: product
+  spec:
+    host: product
+    subsets:
+    - name: current-version
+      labels:
+        version: ${PRODUCT_VERSION}
 
 ###############################################################################
 # User service
@@ -349,6 +376,8 @@ objects:
         version: ${USER_VERSION}
     template:
       metadata:
+        annotations:
+          sidecar.istio.io/inject: "true"
         labels:
           app: user
           version: ${USER_VERSION}
@@ -403,26 +432,33 @@ objects:
       targetPort: 8080
     selector:
       app: user
-      version: ${USER_VERSION}
 
-- apiVersion: route.openshift.io/v1
-  kind: Route
+- apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
   metadata:
-    labels:
-      app: user
-      version: ${USER_VERSION}
-      app.kubernetes.io/name: user
-      app.kubernetes.io/version: ${USER_VERSION}
-      app.kubernetes.io/component: service
-      app.kubernetes.io/part-of: ${APP_NAME}
     name: user
   spec:
-    port:
-      targetPort: http
-    to:
-      kind: Service
-      name: user
-      weight: 100
+    gateways:
+    - mesh
+    hosts:
+    - user
+    http:
+    - route:
+      - destination:
+          host: user
+          subset: current-version
+        weight: 100
+
+- apiVersion: networking.istio.io/v1alpha3
+  kind: DestinationRule
+  metadata:
+    name: user
+  spec:
+    host: user
+    subsets:
+    - name: current-version
+      labels:
+        version: ${USER_VERSION}
 
 ###############################################################################
 # Parameters
