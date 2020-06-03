@@ -4,4 +4,4 @@ metadata:
   name: default
 spec:
   members:
-    - grpc_demo
+    - grpc-demo-istio

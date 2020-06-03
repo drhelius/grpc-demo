@@ -23,7 +23,7 @@ objects:
   kind: Deployment
   metadata:
     annotations:
-      app.openshift.io/connects-to: user,order
+      app.openshift.io/connects-to: user-${USER_VERSION},order-${ORDER_VERSION}
       app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-account
       app.openshift.io/vcs-ref: ${ACCOUNT_VERSION}
     labels:
@@ -34,6 +34,7 @@ objects:
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
       app.openshift.io/runtime: golang
+      group: ${APP_NAME}
     name: account-${ACCOUNT_VERSION}
   spec:
     replicas: 1
@@ -84,6 +85,7 @@ objects:
       app.kubernetes.io/version: ${ACCOUNT_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: account
   spec:
     ports:
@@ -109,6 +111,7 @@ objects:
       app.kubernetes.io/version: ${ACCOUNT_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: account
   spec:
     port:
@@ -125,7 +128,7 @@ objects:
   kind: Deployment
   metadata:
     annotations:
-      app.openshift.io/connects-to: product
+      app.openshift.io/connects-to: product-${PRODUCT_VERSION}
       app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-order
       app.openshift.io/vcs-ref: ${ORDER_VERSION}
     labels:
@@ -136,6 +139,7 @@ objects:
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
       app.openshift.io/runtime: golang
+      group: ${APP_NAME}
     name: order-${ORDER_VERSION}
   spec:
     replicas: 1
@@ -186,6 +190,7 @@ objects:
       app.kubernetes.io/version: ${ORDER_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: order
   spec:
     ports:
@@ -211,6 +216,7 @@ objects:
       app.kubernetes.io/version: ${ORDER_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: order
   spec:
     port:
@@ -238,6 +244,7 @@ objects:
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
       app.openshift.io/runtime: golang
+      group: ${APP_NAME}
     name: product-${PRODUCT_VERSION}
   spec:
     replicas: 1
@@ -288,6 +295,7 @@ objects:
       app.kubernetes.io/version: ${PRODUCT_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: product
   spec:
     ports:
@@ -313,6 +321,7 @@ objects:
       app.kubernetes.io/version: ${PRODUCT_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: product
   spec:
     port:
@@ -340,6 +349,7 @@ objects:
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
       app.openshift.io/runtime: golang
+      group: ${APP_NAME}
     name: user-${USER_VERSION}
   spec:
     replicas: 1
@@ -390,6 +400,7 @@ objects:
       app.kubernetes.io/version: ${USER_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: user
   spec:
     ports:
@@ -415,6 +426,7 @@ objects:
       app.kubernetes.io/version: ${USER_VERSION}
       app.kubernetes.io/component: service
       app.kubernetes.io/part-of: ${APP_NAME}
+      group: ${APP_NAME}
     name: user
   spec:
     port:
@@ -440,7 +452,7 @@ parameters:
 - description: Sets the Account Service version.
   name: ACCOUNT_VERSION
   displayName: Account Service version
-  value: v1.0.0
+  value: v3.0.0
 - description: Specifies how many instances of the Account Service to create in the cluster.
   name: ACCOUNT_REPLICAS
   displayName: Account Service replicas
@@ -452,7 +464,7 @@ parameters:
 - description: Sets the Order Service version.
   name: ORDER_VERSION
   displayName: Order Service version
-  value: v1.0.0
+  value: v3.0.0
 - description: Specifies how many instances of the Order Service to create in the cluster.
   name: ORDER_REPLICAS
   displayName: Order Service replicas
@@ -464,7 +476,7 @@ parameters:
 - description: Sets the Product Service version.
   name: PRODUCT_VERSION
   displayName: Product Service version
-  value: v1.0.0
+  value: v3.0.0
 - description: Specifies how many instances of the Product Service to create in the cluster.
   name: PRODUCT_REPLICAS
   displayName: Product Service replicas
@@ -476,7 +488,7 @@ parameters:
 - description: Sets the User Service version.
   name: USER_VERSION
   displayName: User Service version
-  value: v1.0.0
+  value: v3.0.0
 - description: Specifies how many instances of the User Service to create in the cluster.
   name: USER_REPLICAS
   displayName: User Service replicas
