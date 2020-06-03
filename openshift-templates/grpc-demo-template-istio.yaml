@@ -669,7 +669,7 @@ parameters:
 - description: Sets the Account Service version.
   name: ACCOUNT_VERSION
   displayName: Account Service version
-  value: v3.0.0
+  value: v1.0.0
 - description: Specifies how many instances of the Account Service to create in the cluster.
   name: ACCOUNT_REPLICAS
   displayName: Account Service replicas
@@ -684,7 +684,7 @@ parameters:
 - description: Sets the Order Service version.
   name: ORDER_VERSION
   displayName: Order Service version
-  value: v3.0.0
+  value: v1.0.0
 - description: Specifies how many instances of the Order Service to create in the cluster.
   name: ORDER_REPLICAS
   displayName: Order Service replicas
@@ -696,7 +696,7 @@ parameters:
 - description: Sets the Product Service version.
   name: PRODUCT_VERSION
   displayName: Product Service version
-  value: v3.0.0
+  value: v1.0.0
 - description: Specifies how many instances of the Product Service to create in the cluster.
   name: PRODUCT_REPLICAS
   displayName: Product Service replicas
@@ -708,7 +708,7 @@ parameters:
 - description: Sets the User Service version.
   name: USER_VERSION
   displayName: User Service version
-  value: v3.0.0
+  value: v1.0.0
 - description: Specifies how many instances of the User Service to create in the cluster.
   name: USER_REPLICAS
   displayName: User Service replicas
