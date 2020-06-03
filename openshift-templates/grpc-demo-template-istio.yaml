@@ -4,9 +4,9 @@ labels:
   template: grpc-demo-istio
 metadata:
   annotations:
-    description: A group of interconnected GRPC demo services written in Go running on Istio.
+    description: A group of interconnected GRPC demo services written in Go that run on OpenShift Service Mesh.
     iconClass: icon-go-gopher
-    openshift.io/display-name: Interconnected GRPC demo services for Istio.
+    openshift.io/display-name: Interconnected GRPC demo services running on OpenShift Service Mesh.
     openshift.io/documentation-url: https://github.com/drhelius/grpc-demo
     openshift.io/provider-display-name: Ignacio Sánchez
     openshift.io/support-url: https://twitter.com/drhelius
@@ -677,6 +677,7 @@ parameters:
 - description: Specifies how many instances of the Account Service to create in the cluster.
   name: ACCOUNT_ROUTE
   displayName: Route URL for external access to Account Service
+  value: "account-grpc-demo.mycluster.com"
 - description: Sets the Order Service image.
   name: ORDER_IMAGE
   displayName: Order Service image

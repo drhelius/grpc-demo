@@ -6,7 +6,7 @@ metadata:
   annotations:
     description: A group of interconnected GRPC demo services written in Go.
     iconClass: icon-go-gopher
-    openshift.io/display-name: Interconnected GRPC demo services
+    openshift.io/display-name: Interconnected GRPC demo services.
     openshift.io/documentation-url: https://github.com/drhelius/grpc-demo
     openshift.io/provider-display-name: Ignacio Sánchez
     openshift.io/support-url: https://twitter.com/drhelius

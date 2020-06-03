@@ -7,6 +7,7 @@ spec:
     gateways:
       istio-egressgateway:
         autoscaleEnabled: false
+        ior_enabled: false
       istio-ingressgateway:
         autoscaleEnabled: false
         ior_enabled: true
