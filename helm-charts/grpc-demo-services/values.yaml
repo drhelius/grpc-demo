@@ -1,0 +1,29 @@
+appName: grpc-demo
+
+account:
+  image: quay.io/isanchez/grpc-demo-account
+  version: v1.0.0
+  replicas: "1"
+
+order:
+  image: quay.io/isanchez/grpc-demo-order
+  version: v1.0.0
+  replicas: "1"
+
+product:
+  image: quay.io/isanchez/grpc-demo-product
+  version: v1.0.0
+  replicas: "1"
+
+user:
+  image: quay.io/isanchez/grpc-demo-user
+  version: v1.0.0
+  replicas: "1"
+
+limits:
+  memory: "200"
+  cpu: "0.5"
+
+requests:
+  memory: "100"
+  cpu: "0.1"
