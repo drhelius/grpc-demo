@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  labels:
+    app: order
+    app.kubernetes.io/name: order
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    group: {{ .Values.appName }}
+  name: order
+spec:
+  host: order
+  subsets:
+  - name: current-version
+    labels:
+      version: {{ .Values.order.version }}

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/vcs-uri: https://github.com/drhelius/grpc-demo-order
+    app.openshift.io/vcs-ref: {{ .Values.order.version }}
+  labels:
+    app: order
+    version: {{ .Values.order.version }}
+    app.kubernetes.io/name: order
+    app.kubernetes.io/version: {{ .Values.order.version }}
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    app.openshift.io/runtime: golang
+    group: {{ .Values.appName }}
+  name: order-{{ .Values.order.version }}
+spec:
+  replicas: {{ .Values.order.replicas }}
+  selector:
+    matchLabels:
+      app: order
+      version: {{ .Values.order.version }}
+  template:
+    metadata:
+      annotations:
+          sidecar.istio.io/inject: "true"
+      labels:
+        app: order
+        version: {{ .Values.order.version }}
+    spec:
+      containers:
+      - image: {{ .Values.order.image }}:{{ .Values.order.version }}
+        imagePullPolicy: Always
+        name: order
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.limits.cpu }}
+            memory: {{ .Values.limits.memory }}Mi
+          requests:
+            cpu: {{ .Values.requests.cpu }}
+            memory: {{ .Values.requests.memory }}Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30

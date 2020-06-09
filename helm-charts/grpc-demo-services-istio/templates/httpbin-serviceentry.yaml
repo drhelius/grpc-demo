@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  labels:
+    app: httpbin
+    app.kubernetes.io/name: httpbin
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    group: {{ .Values.appName }}
+  name: httpbin
+spec:
+  hosts:
+  - httpbin.org
+  ports:
+  - number: 443
+    name: tls
+    protocol: TLS
+  resolution: DNS

@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  labels:
+    app: order
+    app.kubernetes.io/name: order
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    group: {{ .Values.appName }}
+  name: order
+spec:
+  gateways:
+  - mesh
+  hosts:
+  - order
+  http:
+  - route:
+    - destination:
+        host: order
+        subset: current-version
+      weight: 100

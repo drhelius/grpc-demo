@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  labels:
+    app: user
+    app.kubernetes.io/name: user
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    group: {{ .Values.appName }}
+  name: user
+spec:
+  gateways:
+  - mesh
+  hosts:
+  - user
+  http:
+  - route:
+    - destination:
+        host: user
+        subset: current-version
+      weight: 100

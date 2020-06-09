@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  labels:
+    app: account
+    app.kubernetes.io/name: account
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    group: {{ .Values.appName }}
+  name: account-gw
+spec:
+  hosts:
+  - {{ .Values.account.route }}
+  gateways:
+  - account
+  http:
+  - route:
+    - destination:
+        host: account
+        port:
+          number: 8080
+      weight: 100

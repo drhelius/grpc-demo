@@ -1,0 +1,18 @@
+apiVersion: v2
+name: grpc-demo-services-istio
+version: 1.0.0
+description: A group of interconnected GRPC demo services written in Go that run on OpenShift Service Mesh.
+keywords:
+  - go
+  - grpc
+  - demo
+  - service
+  - istio
+home: https://github.com/drhelius/grpc-demo
+sources:
+  - https://github.com/drhelius/grpc-demo
+maintainers:
+  - name: Ignacio Sánchez
+    email: isanchez@redhat.com
+    url: https://twitter.com/drhelius
+icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg

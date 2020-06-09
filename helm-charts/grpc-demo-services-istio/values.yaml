@@ -1,9 +1,10 @@
-appName: grpc-demo
+appName: grpc-demo-istio
 
 account:
   image: quay.io/isanchez/grpc-demo-account
   version: v1.0.0
   replicas: 1
+  route: account-grpc-demo.mycluster.com
 
 order:
   image: quay.io/isanchez/grpc-demo-order
