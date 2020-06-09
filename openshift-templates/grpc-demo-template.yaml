@@ -37,7 +37,7 @@ objects:
       group: ${APP_NAME}
     name: account-${ACCOUNT_VERSION}
   spec:
-    replicas: ${ACCOUNT_REPLICAS}
+    replicas: ${{ACCOUNT_REPLICAS}}
     selector:
       matchLabels:
         app: account
@@ -142,7 +142,7 @@ objects:
       group: ${APP_NAME}
     name: order-${ORDER_VERSION}
   spec:
-    replicas: ${ORDER_REPLICAS}
+    replicas: ${{ORDER_REPLICAS}}
     selector:
       matchLabels:
         app: order
@@ -247,7 +247,7 @@ objects:
       group: ${APP_NAME}
     name: product-${PRODUCT_VERSION}
   spec:
-    replicas: ${PRODUCT_REPLICAS}
+    replicas: ${{PRODUCT_REPLICAS}}
     selector:
       matchLabels:
         app: product
@@ -352,7 +352,7 @@ objects:
       group: ${APP_NAME}
     name: user-${USER_VERSION}
   spec:
-    replicas: ${USER_REPLICAS}
+    replicas: ${{USER_REPLICAS}}
     selector:
       matchLabels:
         app: user
