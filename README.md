@@ -23,7 +23,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 3. [Creating a Helm chart for deploying services](#3---creating-a-helm-chart-for-deploying-services)
 4. [Creating an OpenShift Template for deploying services](#4---creating-an-openshift-template-for-deploying-services)
 5. [Creating a Kubernetes Operator for deploying services](#5---creating-a-kubernetes-operator-for-deploying-services)
-6. [Installing and operating Istio Service Mesh with OpenShift](#6---installing-and-operating-istio-service-mesh-with-openshift)
+6. [Installing Istio Service Mesh in OpenShift](#6---installing-istio-service-mesh-in-openshift)
 7. [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio)
 8. [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio)
 
@@ -40,13 +40,15 @@ All four microservices are written in go using gRPC as the main communication fr
 
 The relationships between the services look like this:
 
-Three deployment methods are provided for demonstration purposes:
+The demo can be setup using Istio or without using it.
+
+Three deployment methods are provided for demonstration purposes, you are not expected to use them all at once:
 
 - Helm Chart
 - OpenShift Template
 - Kubernetes Operator
 
-Note that, for simplicity, the operator is provided for deploying the services without Istio.
+Note that, for simplicity, the operator is only provided for deploying the demo microservices without Istio.
 
 ## 2 - Writing gRPC services in Go
 
@@ -69,7 +71,7 @@ TODO
 
 OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
 
-These templates can be parameterized but the lack of dynamism (loops and conditionals) usually makes Helm a better option.
+These templates can be parameterized but the lack of dynamism (loops and conditionals) usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
 
 Two templates are provided in this repo for deploying the demo services both with Istio and without it:
 
@@ -88,7 +90,7 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 TODO
 
-## 6 - Installing and operating Istio Service Mesh with OpenShift
+## 6 - Installing Istio Service Mesh in OpenShift
 
 In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
 
@@ -132,7 +134,7 @@ First create a namespace for the control plane, the name `istio-system` is recom
 
 ### Deploy Service Mesh control plane
 
-With the project ready we can create the control plane.
+Once the project is ready you can create the control plane.
 
 A Service Mesh Control Plane manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
 
@@ -347,13 +349,13 @@ You can uninstall everything deployed by running:
 
 ## 8 - Deploying the demo services without using Istio
 
-Three methods are provided to deploy the demo services and setup the service mesh:
+Three methods are provided to deploy the demo services without using a service mesh:
 
 - Helm Chart
 - OpenShift Template
 - Kubernetes Operator
 
-But first you need to create a namespace for the services.
+You can have the demo services deployed both with Istio and without it at the same time but, for simplicity, you may want to deploy them in a different namespace.
 
 ### Create a project to deploy the demo services
 
@@ -491,11 +493,11 @@ Add the template to your project:
 
 ```bash
 $ oc create -f openshift-templates/grpc-demo-template.yaml
-template.template.openshift.io/grpc-demo-istio created
+template.template.openshift.io/grpc-demo created
 
 $ oc get template
-NAME              DESCRIPTION                                                                        PARAMETERS     OBJECTS
-grpc-demo-istio   A group of interconnected GRPC demo services written in Go that run on OpenSh...   18 (all set)   22
+NAME        DESCRIPTION                                                   PARAMETERS     OBJECTS
+grpc-demo   A group of interconnected GRPC demo services written in Go.   17 (all set)   12
 ```
 
 You can now use the Web Console to create all the services using this template:
@@ -504,6 +506,18 @@ You can also use the cli:
 
 ```bash
 $ oc process -f openshift-templates/grpc-demo-template.yaml | oc create -f -
+deployment.apps/account-v1.0.0 created
+service/account created
+route.route.openshift.io/account created
+deployment.apps/order-v1.0.0 created
+service/order created
+route.route.openshift.io/order created
+deployment.apps/product-v1.0.0 created
+service/product created
+route.route.openshift.io/product created
+deployment.apps/user-v1.0.0 created
+service/user created
+route.route.openshift.io/user created
 ```
 
 After a few minutes the services should be up an running:
@@ -511,10 +525,10 @@ After a few minutes the services should be up an running:
 ```bash
 $ oc get deployments
 NAME             READY   UP-TO-DATE   AVAILABLE   AGE
-account-v1.0.0   1/1     1            1           3m1s
-order-v1.0.0     1/1     1            1           3m1s
-product-v1.0.0   1/1     1            1           3m1s
-user-v1.0.0      1/1     1            1           3m1s
+account-v1.0.0   1/1     1            1           43s
+order-v1.0.0     1/1     1            1           42s
+product-v1.0.0   1/1     1            1           42s
+user-v1.0.0      1/1     1            1           41s
 ```
 
 An HTTP route for every service is automatically created:
@@ -577,7 +591,9 @@ NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
 grpc-demo-operator   1/1     1            1           2m56s
 ```
 
-Now you can create a [custom resource](https://github.com/drhelius/grpc-demo-operator/blob/master/deploy/crds/example_cr.yaml) to instruct the operator to create the demo services:
+The operator is watching custom resources with kind `services.grpcdemo.example.com`.
+
+Now you can create your own [custom resource](https://github.com/drhelius/grpc-demo-operator/blob/master/deploy/crds/example_cr.yaml) to instruct the operator to create the demo services:
 
 ```yaml
 apiVersion: grpcdemo.example.com/v1
@@ -651,7 +667,7 @@ An HTTP route for every service is automatically created:
 
 ```bash
 $ oc get route
-NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
+NAME      HOST/PORT                                     PATH   SERVICES   PORT   TERMINATION   WILDCARD
 account   account-grpc-demo.apps.mycluster.com                 account    http                 None
 order     order-grpc-demo.apps.mycluster.com                   order      http                 None
 product   product-grpc-demo.apps.mycluster.com                 product    http                 None
