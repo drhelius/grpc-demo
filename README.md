@@ -18,16 +18,16 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 ## Index
 
-1. [Architecture](#1.-architecture)
-2. [Writing gRPC services in Go](#2.-writing-grpc-services-in-go)
-3. [Creating a Helm chart for deploying services](#3.-creating-a-helm-chart-for-deploying-services)
-4. [Creating an OpenShift Template for deploying services](#4.-creating-an-openshift-template-for-deploying-services)
-5. [Creating a Kubernetes Operator for deploying services](#5.-writing-grpc-services-in-go)
-6. [Installing and operating Istio Service Mesh with OpenShift](#6.-writing-grpc-services-in-go)
-7. [Deploying the demo services using Istio](#7.-deploying-the-demo-services-using-istio)
-8. [Deploying the demo services without using Istio](#8.-deploying-the-demo-services-without-using-istio)
+1. [Architecture](#1---architecture)
+2. [Writing gRPC services in Go](#2---writing-grpc-services-in-go)
+3. [Creating a Helm chart for deploying services](#3---creating-a-helm-chart-for-deploying-services)
+4. [Creating an OpenShift Template for deploying services](#4---creating-an-openshift-template-for-deploying-services)
+5. [Creating a Kubernetes Operator for deploying services](#5---writing-grpc-services-in-go)
+6. [Installing and operating Istio Service Mesh with OpenShift](#6---writing-grpc-services-in-go)
+7. [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio)
+8. [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio)
 
-## 1. Architecture
+## 1 - Architecture
 
 This demo is composed of four microservices modeling how a person buy products in an eCommerce:
 
@@ -44,11 +44,11 @@ Three deployment methods are provided for demonstration purposes:
 - Kubernetes Operator
 - OpenShift Template
 
-## 2. Writing gRPC services in Go
+## 2 - Writing gRPC services in Go
 
 TODO
 
-## 3. Creating a Helm chart for deploying services
+## 3 - Creating a Helm chart for deploying services
 
 TODO
 
@@ -64,7 +64,7 @@ TODO
 
 `helm uninstall grpc-demo-istio`
 
-## 4. Creating an OpenShift Template for deploying services
+## 4 - Creating an OpenShift Template for deploying services
 
 OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
 
@@ -83,11 +83,11 @@ The `APP_NAME` parameter is just an identifier to label all the manifests create
 
 The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the account service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid fqdn for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
-## 5. Creating a Kubernetes Operator for deploying services
+## 5 - Creating a Kubernetes Operator for deploying services
 
 TODO
 
-## 6. Installing and operating Istio Service Mesh with OpenShift
+## 6 - Installing and operating Istio Service Mesh with OpenShift
 
 In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
 
@@ -131,7 +131,7 @@ A Service Mesh Control Plane (SMCP) is [provided in this repo](openshift-service
 
 `oc create -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
 
-## 7. Deploying the demo services using Istio
+## 7 - Deploying the demo services using Istio
 
 ### Create a project to deploy our services
 
@@ -141,7 +141,7 @@ A Service Mesh Control Plane (SMCP) is [provided in this repo](openshift-service
 
 `oc create -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
 
-## 8. Deploying the demo services without using Istio
+## 8 - Deploying the demo services without using Istio
 
 TODO
 
