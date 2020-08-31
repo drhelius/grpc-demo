@@ -38,6 +38,8 @@ This demo is composed of four microservices modeling how a person buy products i
 
 All four microservices are written in go using gRPC as the main communication framework. Additionally, an HTTP (REST) listener is also provided for each of them.
 
+The relationships between the services look like this:
+
 Three deployment methods are provided for demonstration purposes:
 
 - Helm Chart
@@ -77,11 +79,11 @@ Two templates are provided in this repo for deploying the demo services both wit
 
 These templates define all the manifests needed in order to get the services deployed and working.
 
-The parameters allow you configure the services image, version, replicas and resources.
+The parameters allow you to configure the services image, version, replicas and resources.
 
-The `APP_NAME` parameter is just an identifier to label all the manifests created by the templates and organize the view in the Developer Console.
+The `APP_NAME` parameter is just an identifier to label all the manifests created by the templates and organize the view in the OpenShift Developer Console.
 
-The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the account service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid fqdn for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
+The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the Account service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
 ## 5 - Creating a Kubernetes Operator for deploying services
 
@@ -123,21 +125,41 @@ Istio in OpenShift is installed by running a set of operators. Before installing
 
 ### Create project istio-system
 
+With all four operators installed in your cluster you are ready to deploy Istio.
+
+First create a namespace for the control plane, the name `istio-system` is recommended:
+
 `oc new-project istio-system`
 
 ### Deploy Service Mesh control plane
 
-A Service Mesh Control Plane (SMCP) is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift.
+With the project ready we can create the control plane.
+
+A Service Mesh Control Plane (SMCP) manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
 
 `oc create -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
 
+Istio operator will then create all the deployments that conform the control plane. After a few minutes it should look like this:
+
 ## 7 - Deploying the demo services using Istio
 
-### Create a project to deploy our services
+You can choose three different methods to deploy the demo services and setup the service mesh:
+
+- Helm Chart
+- Kubernetes Operator
+- OpenShift Template
+
+But first you need to create a namespace for the services and tell Istio to start monitoring this namespace by adding it to the [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm).
+
+### Create a project to deploy the demo services
 
 `oc new-project grpc-demo-istio`
 
 ### Create the service mesh member roll
+
+A Service Mesh Member Roll (SMMR) manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio`. If you are using a different namespace you should change it accordingly.
+
+Use it then to create the Member Roll:
 
 `oc create -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
 
