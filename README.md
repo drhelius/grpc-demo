@@ -43,8 +43,10 @@ The relationships between the services look like this:
 Three deployment methods are provided for demonstration purposes:
 
 - Helm Chart
-- Kubernetes Operator
 - OpenShift Template
+- Kubernetes Operator
+
+Note that, for simplicity, the operator is provided for deploying the services without Istio.
 
 ## 2 - Writing gRPC services in Go
 
@@ -62,9 +64,6 @@ TODO
 
 `helm fetch grpc-demo/grpc-demo-services`
 
-`helm install --set account.route=account-grpc-demo.mycluster.com grpc-demo-istio grpc-demo/grpc-demo-services-istio`
-
-`helm uninstall grpc-demo-istio`
 
 ## 4 - Creating an OpenShift Template for deploying services
 
@@ -123,9 +122,9 @@ Istio in OpenShift is installed by running a set of operators. Before installing
 - Installed Namespace: openshift-operators
 - Approval Strategy: Automatic
 
-### Create project istio-system
+### Create istio-system project
 
-With all four operators installed in your cluster you are ready to deploy Istio.
+With all four required operators installed in your cluster you are ready to deploy Istio.
 
 First create a namespace for the control plane, the name `istio-system` is recommended:
 
@@ -143,10 +142,9 @@ Istio operator will then create all the deployments that conform the control pla
 
 ## 7 - Deploying the demo services using Istio
 
-You can choose three different methods to deploy the demo services and setup the service mesh:
+Two methods are provided to deploy the demo services and setup the service mesh:
 
 - Helm Chart
-- Kubernetes Operator
 - OpenShift Template
 
 But first you need to create a namespace for the services and tell Istio to start monitoring this namespace by adding it to the [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm).
@@ -163,15 +161,15 @@ Use it to create the Member Roll:
 
 `$ oc create -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
 
-### Deploying the demo services using a Helm Chart
+### Deploy the services using a Helm Chart
 
-If you wish to use the provided Helm chart follow this steps.
+If you wish to use the [provided Helm chart](helm-charts/grpc-demo-services-istio/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
 
 Make sure you are working with the right namespace:
 
 `$ oc project grpc-demo-istio`
 
-Add the chart repository to your helm client:
+Add the chart repository to your helm client and name it `grpc-demo`:
 
 ```bash
 
@@ -192,7 +190,7 @@ Hang tight while we grab the latest from your chart repositories...
 Update Complete. ⎈ Happy Helming!⎈
 ```
 
-You can inspect the chart before you install it in your cluster:
+The chart you are going to install is called `grpc-demo-services-istio`. You can inspect the chart before installing it in your cluster:
 
 ```bash
 $ helm show chart grpc-demo/grpc-demo-services-istio
@@ -217,7 +215,7 @@ sources:
 version: 1.0.0
 ```
 
-The chart can be paramterized. These are the default values for all the parameters:
+The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services-istio/values.yaml) for all the parameters:
 
 ```yaml
 appName: grpc-demo-istio
@@ -252,7 +250,7 @@ requests:
   cpu: "0.1"
 ```
 
-Note that you must provide a valid *fqdn* for the route that is going to expose the Account service using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
+Note that you must provide a valid *fqdn* for the route that is going to expose the Account service HTTP listener using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
 
 Install the chart using a custom Account route:
 
@@ -269,15 +267,404 @@ product-v1.0.0   1/1     1            1           3m1s
 user-v1.0.0      1/1     1            1           3m1s
 ```
 
-You can uninstall all by running:
+You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
 
 `$ helm uninstall grpc-demo-istio`
 
+### Deploy the services using an OpenShift template
+
+If you wish to use the [provided OpenShift template](openshift-templates/grpc-demo-template-istio.yaml) to deploy the demo services and all required manifests follow this steps.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo-istio`
+
+Add the template to your project:
+
+```bash
+$ oc create -f openshift-templates/grpc-demo-template-istio.yaml
+template.template.openshift.io/grpc-demo-istio created
+
+$ oc get template
+NAME              DESCRIPTION                                                                        PARAMETERS     OBJECTS
+grpc-demo-istio   A group of interconnected GRPC demo services written in Go that run on OpenSh...   18 (all set)   22
+```
+
+This template expects a parameter named `ACCOUNT_ROUTE` to expose the Account service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
+
+You can now use the Web Console to create all the services using this template:
+
+You can also use the cli:
+
+```bash
+$ oc process -f openshift-templates/grpc-demo-template-istio.yaml -p ACCOUNT_ROUTE=account-grpc-demo.mycluster.com | oc create -f -
+deployment.apps/account-v1.0.0 created
+service/account created
+virtualservice.networking.istio.io/account created
+destinationrule.networking.istio.io/account created
+gateway.networking.istio.io/account created
+virtualservice.networking.istio.io/account-gateway created
+deployment.apps/order-v1.0.0 created
+service/order created
+virtualservice.networking.istio.io/order created
+destinationrule.networking.istio.io/order created
+deployment.apps/product-v1.0.0 created
+service/product created
+virtualservice.networking.istio.io/product created
+destinationrule.networking.istio.io/product created
+deployment.apps/user-v1.0.0 created
+service/user created
+virtualservice.networking.istio.io/user created
+destinationrule.networking.istio.io/user created
+serviceentry.networking.istio.io/httpbin created
+gateway.networking.istio.io/httpbin created
+destinationrule.networking.istio.io/httpbin created
+virtualservice.networking.istio.io/httpbin created
+```
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
+
 ## 8 - Deploying the demo services without using Istio
 
-TODO
+Three methods are provided to deploy the demo services and setup the service mesh:
 
+- Helm Chart
+- OpenShift Template
+- Kubernetes Operator
 
+But first you need to create a namespace for the services.
 
+### Create a project to deploy the demo services
 
+`$ oc new-project grpc-demo`
 
+### Deploy the services using a Helm Chart
+
+If you wish to use the [provided Helm chart](helm-charts/grpc-demo-services/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo`
+
+Add the chart repository to your helm client and name it `grpc-demo`:
+
+```bash
+
+$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
+"grpc-demo" has been added to your repositories
+
+$ helm repo list
+NAME        URL
+grpc-demo   https://drhelius.github.io/grpc-demo/
+```
+
+Make sure you get the latest list of charts:
+
+```bash
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "grpc-demo" chart repository
+Update Complete. ⎈ Happy Helming!⎈
+```
+
+The chart you are going to install is called `grpc-demo-services`. You can inspect the chart before installing it in your cluster:
+
+```bash
+$ helm show chart grpc-demo/grpc-demo-services
+apiVersion: v2
+description: A group of interconnected GRPC demo services written in Go.
+home: https://github.com/drhelius/grpc-demo
+icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
+keywords:
+- go
+- grpc
+- demo
+- service
+maintainers:
+- email: isanchez@redhat.com
+  name: Ignacio Sánchez
+  url: https://twitter.com/drhelius
+name: grpc-demo-services
+sources:
+- https://github.com/drhelius/grpc-demo
+version: 1.0.0
+```
+
+The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services/values.yaml) for all the parameters:
+
+```yaml
+appName: grpc-demo
+
+account:
+  image: quay.io/isanchez/grpc-demo-account
+  version: v1.0.0
+  replicas: 1
+
+order:
+  image: quay.io/isanchez/grpc-demo-order
+  version: v1.0.0
+  replicas: 1
+
+product:
+  image: quay.io/isanchez/grpc-demo-product
+  version: v1.0.0
+  replicas: 1
+
+user:
+  image: quay.io/isanchez/grpc-demo-user
+  version: v1.0.0
+  replicas: 1
+
+limits:
+  memory: "200"
+  cpu: "0.5"
+
+requests:
+  memory: "100"
+  cpu: "0.1"
+```
+
+Install the chart:
+
+`$ helm install grpc-demo grpc-demo/grpc-demo-services`
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+An HTTP route for every service is automatically created:
+
+```bash
+$ oc get route
+NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
+account   account-grpc-demo.apps.mycluster.com                 account    http                 None
+order     order-grpc-demo.apps.mycluster.com                   order      http                 None
+product   product-grpc-demo.apps.mycluster.com                 product    http                 None
+user      user-grpc-demo.apps.mycluster.com                    user       http                 None
+```
+
+You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ helm uninstall grpc-demo`
+
+### Deploy the services using an OpenShift template
+
+If you wish to use the [provided OpenShift template](openshift-templates/grpc-demo-template.yaml) to deploy the demo services and all required manifests follow this steps.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo`
+
+Add the template to your project:
+
+```bash
+$ oc create -f openshift-templates/grpc-demo-template.yaml
+template.template.openshift.io/grpc-demo-istio created
+
+$ oc get template
+NAME              DESCRIPTION                                                                        PARAMETERS     OBJECTS
+grpc-demo-istio   A group of interconnected GRPC demo services written in Go that run on OpenSh...   18 (all set)   22
+```
+
+You can now use the Web Console to create all the services using this template:
+
+You can also use the cli:
+
+```bash
+$ oc process -f openshift-templates/grpc-demo-template.yaml | oc create -f -
+```
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+An HTTP route for every service is automatically created:
+
+```bash
+$ oc get route
+NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
+account   account-grpc-demo.apps.mycluster.com                 account    http                 None
+order     order-grpc-demo.apps.mycluster.com                   order      http                 None
+product   product-grpc-demo.apps.mycluster.com                 product    http                 None
+user      user-grpc-demo.apps.mycluster.com                    user       http                 None
+```
+
+You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
+
+### Deploy the services using a Kubernetes Operator
+
+If you wish to use the [provided Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator) to deploy the demo services and all required manifests follow this steps.
+
+First clone the operator repository:
+
+```bash
+$ git clone https://github.com/drhelius/grpc-demo-operator.git
+$ cd grpc-demo-operator
+```
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo`
+
+The repository you just cloned has a [Makefile](https://github.com/drhelius/grpc-demo-operator/blob/master/Makefile) to assist in some operations.
+
+Run this to deploy the operator, CRDs and required configuration:
+
+```bash
+$ make setup
+kubectl apply -f deploy/crds/grpcdemo.example.com_services_crd.yaml
+customresourcedefinition.apiextensions.k8s.io/services.grpcdemo.example.com created
+kubectl apply -f deploy/service_account.yaml
+serviceaccount/grpc-demo-operator created
+kubectl apply -f deploy/role.yaml
+role.rbac.authorization.k8s.io/grpc-demo-operator created
+kubectl apply -f deploy/role_binding.yaml
+rolebinding.rbac.authorization.k8s.io/grpc-demo-operator created
+kubectl apply -f deploy/operator.yaml
+deployment.apps/grpc-demo-operator created
+```
+
+Make sure the operator is running fine:
+
+```bash
+$ oc get deployment grpc-demo-operator
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+grpc-demo-operator   1/1     1            1           2m56s
+```
+
+Now you can create a [custom resource](https://github.com/drhelius/grpc-demo-operator/blob/master/deploy/crds/example_cr.yaml) to instruct the operator to create the demo services:
+
+```yaml
+apiVersion: grpcdemo.example.com/v1
+kind: Services
+metadata:
+  name: example-services
+spec:
+  services:
+    - name: account
+      image: quay.io/isanchez/grpc-demo-account
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+    - name: order
+      image: quay.io/isanchez/grpc-demo-order
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+    - name: product
+      image: quay.io/isanchez/grpc-demo-product
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+    - name: user
+      image: quay.io/isanchez/grpc-demo-user
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+```
+
+Create the custom resource by using the provided example:
+
+```bash
+$ oc create -f deploy/crds/example_cr.yaml
+services.grpcdemo.example.com/example-services created
+```
+
+After a few minutes the operator should have created all the required objects and the services should be up an running:
+
+```bash
+$ oc get deployment
+NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
+account              1/1     1            1           2m14s
+grpc-demo-operator   1/1     1            1           14m
+order                1/1     1            1           2m14s
+product              1/1     1            1           2m13s
+user                 1/1     1            1           2m13s
+```
+
+An HTTP route for every service is automatically created:
+
+```bash
+$ oc get route
+NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
+account   account-grpc-demo.apps.mycluster.com                 account    http                 None
+order     order-grpc-demo.apps.mycluster.com                   order      http                 None
+product   product-grpc-demo.apps.mycluster.com                 product    http                 None
+user      user-grpc-demo.apps.mycluster.com                    user       http                 None
+```
+
+You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
+
+You can uninstall the services by deleting the custom resource and the operator will delete all of them for you:
+
+```bash
+$ oc delete services.grpcdemo.example.com example-services
+services.grpcdemo.example.com "example-services" deleted
+```
