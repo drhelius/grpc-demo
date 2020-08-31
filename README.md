@@ -129,15 +129,15 @@ With all four operators installed in your cluster you are ready to deploy Istio.
 
 First create a namespace for the control plane, the name `istio-system` is recommended:
 
-`oc new-project istio-system`
+`$ oc new-project istio-system`
 
 ### Deploy Service Mesh control plane
 
 With the project ready we can create the control plane.
 
-A Service Mesh Control Plane (SMCP) manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
+A Service Mesh Control Plane manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
 
-`oc create -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
+`$ oc create -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
 
 Istio operator will then create all the deployments that conform the control plane. After a few minutes it should look like this:
 
@@ -153,15 +153,125 @@ But first you need to create a namespace for the services and tell Istio to star
 
 ### Create a project to deploy the demo services
 
-`oc new-project grpc-demo-istio`
+`$ oc new-project grpc-demo-istio`
 
 ### Create the service mesh member roll
 
-A Service Mesh Member Roll (SMMR) manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio`. If you are using a different namespace you should change it accordingly.
+A Service Mesh Member Roll manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio` project just created. If you are using a different name for the project you should change it accordingly.
 
-Use it then to create the Member Roll:
+Use it to create the Member Roll:
 
-`oc create -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
+`$ oc create -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
+
+### Deploying the demo services using a Helm Chart
+
+If you wish to use the provided Helm chart follow this steps.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo-istio`
+
+Add the chart repository to your helm client:
+
+```bash
+
+$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
+"grpc-demo" has been added to your repositories
+
+$ helm repo list
+NAME        URL
+grpc-demo   https://drhelius.github.io/grpc-demo/
+```
+
+Make sure you get the latest list of charts:
+
+```bash
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "grpc-demo" chart repository
+Update Complete. ⎈ Happy Helming!⎈
+```
+
+You can inspect the chart before you install it in your cluster:
+
+```bash
+$ helm show chart grpc-demo/grpc-demo-services-istio
+apiVersion: v2
+description: A group of interconnected GRPC demo services written in Go that run on
+  OpenShift Service Mesh.
+home: https://github.com/drhelius/grpc-demo
+icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
+keywords:
+- go
+- grpc
+- demo
+- service
+- istio
+maintainers:
+- email: isanchez@redhat.com
+  name: Ignacio Sánchez
+  url: https://twitter.com/drhelius
+name: grpc-demo-services-istio
+sources:
+- https://github.com/drhelius/grpc-demo
+version: 1.0.0
+```
+
+The chart can be paramterized. These are the default values for all the parameters:
+
+```yaml
+appName: grpc-demo-istio
+
+account:
+  image: quay.io/isanchez/grpc-demo-account
+  version: v1.0.0
+  replicas: 1
+  route: account-grpc-demo.mycluster.com
+
+order:
+  image: quay.io/isanchez/grpc-demo-order
+  version: v1.0.0
+  replicas: 1
+
+product:
+  image: quay.io/isanchez/grpc-demo-product
+  version: v1.0.0
+  replicas: 1
+
+user:
+  image: quay.io/isanchez/grpc-demo-user
+  version: v1.0.0
+  replicas: 1
+
+limits:
+  memory: "200"
+  cpu: "0.5"
+
+requests:
+  memory: "100"
+  cpu: "0.1"
+```
+
+Note that you must provide a valid *fqdn* for the route that is going to expose the Account service using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
+
+Install the chart using a custom Account route:
+
+`$ helm install --set account.route=account-grpc-demo.mycluster.com grpc-demo-istio grpc-demo/grpc-demo-services-istio`
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+You can uninstall all by running:
+
+`$ helm uninstall grpc-demo-istio`
 
 ## 8 - Deploying the demo services without using Istio
 
