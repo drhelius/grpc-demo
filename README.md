@@ -22,8 +22,8 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 2. [Writing gRPC services in Go](#2---writing-grpc-services-in-go)
 3. [Creating a Helm chart for deploying services](#3---creating-a-helm-chart-for-deploying-services)
 4. [Creating an OpenShift Template for deploying services](#4---creating-an-openshift-template-for-deploying-services)
-5. [Creating a Kubernetes Operator for deploying services](#5---writing-grpc-services-in-go)
-6. [Installing and operating Istio Service Mesh with OpenShift](#6---writing-grpc-services-in-go)
+5. [Creating a Kubernetes Operator for deploying services](#5---creating-a-kubernetes-operator-for-deploying-services)
+6. [Installing and operating Istio Service Mesh with OpenShift](#6---installing-and-operating-istio-service-mesh-with-openshift)
 7. [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio)
 8. [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio)
 
