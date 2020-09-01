@@ -6,13 +6,15 @@ STILL IN DEVELOPMENT
 
 ---
 
+![](images/kiali3.png)
+
 This is a demo to showcase the features of some of the technologies that may be involved in modern microservice development and operation within a Kubernetes platform.
 
 This technologies include [Go](https://golang.org/), [gRPC](https://grpc.io/), [Istio](https://istio.io/), [Helm](https://helm.sh/) and [Kubernetes Operators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
-Note that this is just a demo and may not represent the real life, but it could help you to understand basic concepts that may be the building blocks to create more complex gRPC microservices in a service mesh.
+Note that this is just a demo and may not represent the real life. Technologies are mixed but they may not be used all at once. Hopefully it could help you to understand basic concepts that may be the building blocks to create more complex gRPC microservices in a service mesh.
 
-Three different mechanisms are provided to deploy the demo. You can also choose wether you use Istio or not.
+For deployment, three different mechanisms are provided. You can also choose wether you use Istio or not.
 
 All the examples are provided for Red Hat OpenShift but could be applied to any Kubernetes distribution. If you want to run OpenShift on your laptop you may want to try [Red Hat CodeReady Containers](https://developers.redhat.com/products/codeready-containers/overview).
 
@@ -26,10 +28,13 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 6. [Installing Istio Service Mesh in OpenShift](#6---installing-istio-service-mesh-in-openshift)
 7. [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio)
 8. [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio)
+9. [Observability with Kiali](#9---observability-with-kiali)
 
 ## 1 - Architecture
 
-This demo is composed of four microservices modeling how a person buy products in an eCommerce:
+![Demo Services](images/architecture.png "Demo Services")
+
+This demo is composed of four microservices modeling how a customer buy products in an eCommerce:
 
 - [Account](https://github.com/drhelius/grpc-demo-account): Models a user account. The user can have many orders in it. The account also has a reference to user information.
 - [Order](https://github.com/drhelius/grpc-demo-order): This is a group of products ordered by the user.
@@ -37,8 +42,6 @@ This demo is composed of four microservices modeling how a person buy products i
 - [Product](https://github.com/drhelius/grpc-demo-product): A description of a product in the store including price an details.
 
 All four microservices are written in go using gRPC as the main communication framework. Additionally, an HTTP (REST) listener is also provided for each of them.
-
-The relationships between the services look like this:
 
 The demo can be setup using Istio or without using it.
 
@@ -56,6 +59,8 @@ TODO
 
 ## 3 - Creating a Helm chart for deploying services
 
+![Helm Release](images/helm.png "Helm Release")
+
 TODO
 
 `helm package helm-charts/grpc-demo-services`
@@ -66,12 +71,13 @@ TODO
 
 `helm fetch grpc-demo/grpc-demo-services`
 
-
 ## 4 - Creating an OpenShift Template for deploying services
 
 OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
 
 These templates can be parameterized but the lack of dynamism (loops and conditionals) usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
+
+![Demo Templates](images/templates.png "Demo Templates")
 
 Two templates are provided in this repo for deploying the demo services both with Istio and without it:
 
@@ -88,13 +94,20 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ## 5 - Creating a Kubernetes Operator for deploying services
 
+![Deploying with operator](images/architecture_operator.png "Deploying with operator")
+
 TODO
+
+https://developers.redhat.com/books/kubernetes-operators
+https://sdk.operatorframework.io/
 
 ## 6 - Installing Istio Service Mesh in OpenShift
 
 In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
 
-Istio in OpenShift is installed by running a set of operators. Before installing the Red Hat Service Mesh operator you have to install the Elasticsearch, Jaeger and Kiali operators.
+Istio in OpenShift is installed by running a set of operators. Before installing the Red Hat Service Mesh operator you have to install the Elasticsearch, Jaeger and Kiali operators, in this order.
+
+![Red Hat Service Mesh Operators](images/operators.png "Red Hat Service Mesh Operators")
 
 ### Install Elasticsearch Operator
 
@@ -141,6 +154,24 @@ A Service Mesh Control Plane manifest is [provided in this repo](openshift-servi
 `$ oc create -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
 
 Istio operator will then create all the deployments that conform the control plane. After a few minutes it should look like this:
+
+```bash
+$ oc get deployments -n istio-system
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+grafana                  1/1     1            1           41d
+ior                      1/1     1            1           41d
+istio-citadel            1/1     1            1           41d
+istio-egressgateway      1/1     1            1           41d
+istio-galley             1/1     1            1           41d
+istio-ingressgateway     1/1     1            1           41d
+istio-pilot              1/1     1            1           41d
+istio-policy             1/1     1            1           41d
+istio-sidecar-injector   1/1     1            1           41d
+istio-telemetry          1/1     1            1           41d
+jaeger                   1/1     1            1           41d
+kiali                    1/1     1            1           15d
+prometheus               1/1     1            1           41d
+```
 
 ## 7 - Deploying the demo services using Istio
 
@@ -684,3 +715,9 @@ You can uninstall the services by deleting the custom resource and the operator 
 $ oc delete services.grpcdemo.example.com example-services
 services.grpcdemo.example.com "example-services" deleted
 ```
+
+## 9 - Observability with Kiali
+
+![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
+
+![Service Mesh observability](images/kiali3.png "Service Mesh observability")
