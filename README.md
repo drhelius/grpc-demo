@@ -68,7 +68,7 @@ In this demo there are two different charts provided for deploying the services 
 - [grpc-demo-services-istio](helm-charts/grpc-demo-services-istio/Chart.yaml)
 - [grpc-demo-services](helm-charts/grpc-demo-services/Chart.yaml)
 
-These charts deploy all four services at once. This is convenient for this demo but in real life you may want to isolate each service life cycle by installing them independently.
+These charts deploy all four services at once. This is convenient for this demo but in real life you may want to isolate each service lifecycle by installing them independently.
 
 A chart is a Helm package where you define [templates](helm-charts/grpc-demo-services-istio/templates) that will be used to create all the resource definitions to run whatever you wish in a Kubernetes cluster.
 
@@ -107,9 +107,9 @@ Refer to the [official docs](https://helm.sh/docs/topics/charts/) for more infor
 
 Once you have developed a Helm Chart you can make a package and create a Helm repository to distribute it.
 
-Helm repositories are simple web servers that host tgz files. Each chart is distributed as a tgz file package. In addition to the charts you need to create an `index.yaml` to setup your repository. This *index* will contain the information of all the charts in the Helm repo.
+Helm repositories are simple web servers that host tgz files. Each chart is distributed as a tgz file package. In addition to the charts you need to create an `index.yaml` to setup your repository. This index will contain the information of all the charts in the Helm repo.
 
-In this demo a Helm repo is provided by using GitHub Pages. With this method, GitHub let you use a directory in your Git repository to store web content. We can use this directory to store the charts and the `index.yaml`.
+In this demo a Helm repo is provided by using [GitHub Pages](https://pages.github.com/). With this method, GitHub let you use a directory in your git repository to store web content. We can use this directory to store the charts and the `index.yaml`.
 
 This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
 
@@ -122,7 +122,7 @@ $ helm package helm-charts/grpc-demo-services
 $ helm package helm-charts/grpc-demo-services-istio
 ```
 
-This will output a tgz file containing your chart. Put this tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file.
+This will output a tgz file containing your chart. Put these tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file too.
 
 To create your Helm repo index run this command providing the directory path where the tgz files are located and using the URL where you are expecting to serve the Helm repository. It will read the directory and generate an index file based on the charts found:
 
@@ -148,9 +148,9 @@ Two templates are provided in this repo for deploying the demo services both wit
 - [grpc-demo-template-istio.yaml](openshift-templates/grpc-demo-template-istio.yaml)
 - [grpc-demo-template.yaml](openshift-templates/grpc-demo-template.yaml)
 
-These templates deploy all four services at once. This is convenient for this demo but in real life you may want to isolate each service life cycle by deploying them independently.
+These templates deploy all four services at once. This is convenient for this demo but in real life you may want to isolate each service lifecycle by deploying them independently.
 
-These templates define all the manifests needed in order to get the services deployed and working.
+The templates define all the manifests needed in order to get the services deployed and running.
 
 The parameters allow you to configure the services image, version, replicas and resources.
 
