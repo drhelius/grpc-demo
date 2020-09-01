@@ -12,7 +12,7 @@ This is a demo to showcase the features of some of the technologies that may be 
 
 These technologies include [Go](https://golang.org/), [gRPC](https://grpc.io/), [Istio](https://istio.io/), [Helm](https://helm.sh/) and [Kubernetes Operators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
-Note that this is just a demo and may not represent the real life. Technologies are mixed but they may not be used all at once. Hopefully it could help you to understand basic concepts that may be the building blocks to create more complex gRPC microservices in a service mesh.
+Note that this is just a demo and may not represent the real life. Technologies are mixed but they may not be used all at once. Hopefully, it could help you to understand basic concepts that may be the building blocks to create more complex gRPC microservices in a service mesh.
 
 For deployment, three different mechanisms are provided. You can also choose wether you use Istio or not.
 
@@ -22,7 +22,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 1. [Architecture](#1---architecture)
 2. [Writing gRPC services in Go](#2---writing-grpc-services-in-go)
-3. [Creating a Helm chart for deploying services](#3---creating-a-helm-chart-for-deploying-services)
+3. [Creating a Helm Chart for deploying services](#3---creating-a-helm-chart-for-deploying-services)
 4. [Creating an OpenShift Template for deploying services](#4---creating-an-openshift-template-for-deploying-services)
 5. [Creating a Kubernetes Operator for deploying services](#5---creating-a-kubernetes-operator-for-deploying-services)
 6. [Installing Istio Service Mesh in OpenShift](#6---installing-istio-service-mesh-in-openshift)
@@ -36,8 +36,8 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 This demo is composed of four microservices modeling how a customer buy products in an eCommerce:
 
-- [Account](https://github.com/drhelius/grpc-demo-account): Models a user account. The user can have many orders in it. The account also has a reference to user information.
-- [Order](https://github.com/drhelius/grpc-demo-order): This is a group of products ordered by the user.
+- [Account](https://github.com/drhelius/grpc-demo-account): Models a user account. This is a composite that aggregates data about the user personal information and product orders made.
+- [Order](https://github.com/drhelius/grpc-demo-order): This is a group of products ordered by the user in a single transaction.
 - [User](https://github.com/drhelius/grpc-demo-user): The user personal information.
 - [Product](https://github.com/drhelius/grpc-demo-product): A description of a product in the store including price an details.
 
@@ -57,7 +57,7 @@ Note that, for simplicity, the operator is only provided for deploying the demo 
 
 TODO
 
-## 3 - Creating a Helm chart for deploying services
+## 3 - Creating a Helm Chart for deploying services
 
 ![Helm Release](images/helm.png "Helm Release")
 
@@ -68,11 +68,13 @@ In this demo there are two different charts provided for deploying the services 
 - [grpc-demo-services-istio](helm-charts/grpc-demo-services-istio/Chart.yaml)
 - [grpc-demo-services](helm-charts/grpc-demo-services/Chart.yaml)
 
-A Chart is a Helm package where you define [templates](helm-charts/grpc-demo-services-istio/templates) that will be used to create all the resource definitions to run whatever you wish in a Kubernetes cluster.
+These charts deploy all four services at once. This is convenient for this demo but in real life you may want to isolate each service life cycle by installing them independently.
 
-This templates can contain references to variables and functions that will be rendered when the chart is installed.
+A chart is a Helm package where you define [templates](helm-charts/grpc-demo-services-istio/templates) that will be used to create all the resource definitions to run whatever you wish in a Kubernetes cluster.
 
-This an example of a template for defining an Istio Gateway. Note that variables are being used to set up some values. The value of this variables will be provided when the chart is installed:
+These templates can contain references to variables, functions, loops and conditionals that will be rendered when the chart is installed.
+
+This is an example of a template for defining an Istio Gateway for the *Account* service. Note that variables are being used to set up some values. The value of this variables will be provided when the chart is installed:
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -105,26 +107,33 @@ Refer to the [official docs](https://helm.sh/docs/topics/charts/) for more infor
 
 Once you have developed a Helm Chart you can make a package and create a Helm repository to distribute it.
 
-Helm repositories are simple web servers that host zip files. Each Chart is distributed as a zip file package. In addition to the charts you need to create an `index.yaml` to setup your repository. This *index* will contain the information of all the Charts in the Helm repo.
+Helm repositories are simple web servers that host tgz files. Each chart is distributed as a tgz file package. In addition to the charts you need to create an `index.yaml` to setup your repository. This *index* will contain the information of all the charts in the Helm repo.
 
-In this demo a Helm repo is provided by using GitHub Pages. With this method, GitHub let you use a directory in your Git repository to store web content. We can use this directory to store the Charts and the `index.yaml`.
+In this demo a Helm repo is provided by using GitHub Pages. With this method, GitHub let you use a directory in your Git repository to store web content. We can use this directory to store the charts and the `index.yaml`.
 
 This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
 
 If you visit this URL with your browser you will face a 404 as there aren't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml`: <https://drhelius.github.io/grpc-demo/index.yaml>
 
-In order to create the zip files containing the Helm Charts you can use the following commands:
+In order to create the chart tgz file you can use the following commands:
 
 ```bash
 $ helm package helm-charts/grpc-demo-services
 $ helm package helm-charts/grpc-demo-services-istio
 ```
 
-This will output a zip file containing your Chart.
+This will output a tgz file containing your chart. Put this tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file.
 
-To create your repo index run this command changing the *url* parameter with the URL where you are expecting to serve the Helm repository:
+To create your Helm repo index run this command providing the directory path where the tgz files are located and using the URL where you are expecting to serve the Helm repository. It will read the directory and generate an index file based on the charts found:
 
 `$ helm repo index docs --url https://drhelius.github.io/grpc-demo/`
+
+Now you can upload the whole directory to your desired web server. Your users can grab your charts by running:
+
+```bash
+$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
+"grpc-demo" has been added to your repositories
+```
 
 ## 4 - Creating an OpenShift Template for deploying services
 
@@ -139,13 +148,15 @@ Two templates are provided in this repo for deploying the demo services both wit
 - [grpc-demo-template-istio.yaml](openshift-templates/grpc-demo-template-istio.yaml)
 - [grpc-demo-template.yaml](openshift-templates/grpc-demo-template.yaml)
 
+These templates deploy all four services at once. This is convenient for this demo but in real life you may want to isolate each service life cycle by deploying them independently.
+
 These templates define all the manifests needed in order to get the services deployed and working.
 
 The parameters allow you to configure the services image, version, replicas and resources.
 
 The `APP_NAME` parameter is just an identifier to label all the manifests created by the templates and organize the view in the OpenShift Developer Console.
 
-The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the Account service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
+The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
 ## 5 - Creating a Kubernetes Operator for deploying services
 
@@ -251,7 +262,7 @@ Use it to create the Member Roll:
 
 ### Deploy the services using a Helm Chart
 
-If you wish to use the [provided Helm chart](helm-charts/grpc-demo-services-istio/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
+If you wish to use the [provided Helm Chart](helm-charts/grpc-demo-services-istio/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
 
 Make sure you are working with the right namespace:
 
@@ -338,9 +349,9 @@ requests:
   cpu: "0.1"
 ```
 
-Note that you must provide a valid *fqdn* for the route that is going to expose the Account service HTTP listener using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
+Note that you must provide a valid *fqdn* for the route that is going to expose the *Account* service HTTP listener using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
 
-Install the chart using a custom Account route:
+Install the chart using a custom *Account* route:
 
 `$ helm install --set account.route=account-grpc-demo.mycluster.com grpc-demo-istio grpc-demo/grpc-demo-services-istio`
 
@@ -355,7 +366,7 @@ product-v1.0.0   1/1     1            1           3m1s
 user-v1.0.0      1/1     1            1           3m1s
 ```
 
-You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
 
 `$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
 
@@ -382,7 +393,7 @@ NAME              DESCRIPTION                                                   
 grpc-demo-istio   A group of interconnected GRPC demo services written in Go that run on OpenSh...   18 (all set)   22
 ```
 
-This template expects a parameter named `ACCOUNT_ROUTE` to expose the Account service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
+This template expects a parameter named `ACCOUNT_ROUTE` to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
 You can now use the Web Console to create all the services using this template:
 
@@ -425,7 +436,7 @@ product-v1.0.0   1/1     1            1           3m1s
 user-v1.0.0      1/1     1            1           3m1s
 ```
 
-You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
 
 `$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
 
@@ -449,7 +460,7 @@ You can have the demo services deployed both with Istio and without it at the sa
 
 ### Deploy the services using a Helm Chart
 
-If you wish to use the [provided Helm chart](helm-charts/grpc-demo-services/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
+If you wish to use the [provided Helm Chart](helm-charts/grpc-demo-services/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
 
 Make sure you are working with the right namespace:
 
@@ -559,7 +570,7 @@ product   product-grpc-demo.apps.mycluster.com                 product    http  
 user      user-grpc-demo.apps.mycluster.com                    user       http                 None
 ```
 
-You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
 
 `$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
 
@@ -628,7 +639,7 @@ product   product-grpc-demo.apps.mycluster.com                 product    http  
 user      user-grpc-demo.apps.mycluster.com                    user       http                 None
 ```
 
-You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
 
 `$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
 
@@ -760,7 +771,7 @@ product   product-grpc-demo.apps.mycluster.com                 product    http  
 user      user-grpc-demo.apps.mycluster.com                    user       http                 None
 ```
 
-You can test the services using HTTP by sending a GET request to the Account service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
 
 `$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
 
