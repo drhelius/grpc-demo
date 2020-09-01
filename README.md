@@ -10,7 +10,7 @@ STILL IN DEVELOPMENT
 
 This is a demo to showcase the features of some of the technologies that may be involved in modern microservice development and operation within a Kubernetes platform.
 
-This technologies include [Go](https://golang.org/), [gRPC](https://grpc.io/), [Istio](https://istio.io/), [Helm](https://helm.sh/) and [Kubernetes Operators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
+These technologies include [Go](https://golang.org/), [gRPC](https://grpc.io/), [Istio](https://istio.io/), [Helm](https://helm.sh/) and [Kubernetes Operators](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/).
 
 Note that this is just a demo and may not represent the real life. Technologies are mixed but they may not be used all at once. Hopefully it could help you to understand basic concepts that may be the building blocks to create more complex gRPC microservices in a service mesh.
 
@@ -61,15 +61,70 @@ TODO
 
 ![Helm Release](images/helm.png "Helm Release")
 
-TODO
+Helm Charts are an easy and powerful way to deploy your services.
 
-`helm package helm-charts/grpc-demo-services`
+In this demo there are two different charts provided for deploying the services both with Istio and without it:
 
-`helm package helm-charts/grpc-demo-services-istio`
+- [grpc-demo-services-istio](helm-charts/grpc-demo-services-istio/Chart.yaml)
+- [grpc-demo-services](helm-charts/grpc-demo-services/Chart.yaml)
 
-`helm repo index docs --url https://drhelius.github.io/grpc-demo/`
+A Chart is a Helm package where you define [templates](helm-charts/grpc-demo-services-istio/templates) that will be used to create all the resource definitions to run whatever you wish in a Kubernetes cluster.
 
-`helm fetch grpc-demo/grpc-demo-services`
+This templates can contain references to variables and functions that will be rendered when the chart is installed.
+
+This an example of a template for defining an Istio Gateway. Note that variables are being used to set up some values. The value of this variables will be provided when the chart is installed:
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  labels:
+    app: account
+    app.kubernetes.io/name: account
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: {{ .Values.appName }}
+    group: {{ .Values.appName }}
+  name: account
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - hosts:
+    - {{ .Values.account.route }}
+    port:
+      name: http2
+      number: 80
+      protocol: HTTP2
+```
+
+You can also provide [default values](helm-charts/grpc-demo-services-istio/values.yaml) for any variable.
+
+Refer to the [official docs](https://helm.sh/docs/topics/charts/) for more information on how to develop a Helm Chart.
+
+### Packaging and distributing a Helm Chart
+
+Once you have developed a Helm Chart you can make a package and create a Helm repository to distribute it.
+
+Helm repositories are simple web servers that host zip files. Each Chart is distributed as a zip file package. In addition to the charts you need to create an `index.yaml` to setup your repository. This *index* will contain the information of all the Charts in the Helm repo.
+
+In this demo a Helm repo is provided by using GitHub Pages. With this method, GitHub let you use a directory in your Git repository to store web content. We can use this directory to store the Charts and the `index.yaml`.
+
+This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
+
+If you visit this URL with your browser you will face a 404 as there aren't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml`: <https://drhelius.github.io/grpc-demo/index.yaml>
+
+In order to create the zip files containing the Helm Charts you can use the following commands:
+
+```bash
+$ helm package helm-charts/grpc-demo-services
+$ helm package helm-charts/grpc-demo-services-istio
+```
+
+This will output a zip file containing your Chart.
+
+To create your repo index run this command changing the *url* parameter with the URL where you are expecting to serve the Helm repository:
+
+`$ helm repo index docs --url https://drhelius.github.io/grpc-demo/`
 
 ## 4 - Creating an OpenShift Template for deploying services
 
@@ -719,5 +774,33 @@ services.grpcdemo.example.com "example-services" deleted
 ## 9 - Observability with Kiali
 
 ![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
+
+Once you have Istio and the demo services up and running you can observe what is going on in your mesh with Kiali.
+
+First, you need the Kiali route to access the web console:
+
+```bash
+$ oc get routes -n istio-system
+NAME                            HOST/PORT                                                     PATH   SERVICES               PORT    TERMINATION          WILDCARD
+grafana                         grafana-istio-system.apps.mycluster.com                              grafana                <all>   reencrypt            None
+grpc-demo-istio-account-mjs5x   account-grpc-demo-istio-system.apps.mycluster.com                    istio-ingressgateway   http2                        None
+grpc-demo-istio-httpbin-6c9ww   httpbin.org                                                          istio-egressgateway    https   passthrough          None
+istio-ingressgateway            istio-ingressgateway-istio-system.apps.mycluster.com                 istio-ingressgateway   8080                         None
+jaeger                          jaeger-istio-system.apps.mycluster.com                               jaeger-query           <all>   reencrypt            None
+kiali                           kiali-istio-system.apps.mycluster.com                                kiali                  <all>   reencrypt/Redirect   None
+prometheus                      prometheus-istio-system.apps.mycluster.com                           prometheus             <all>   reencrypt            None
+```
+
+Login into Kiali console and select the `grpc-demo-istio` namespace:
+
+![Kiali namespace selection](images/kiali4.png "Kiali namespace selection")
+
+You can choose between different types of graphs:
+
+![Kiali graph selection](images/kiali5.png "Kiali graph selection")
+
+And you can select what is displayed in the graphs:
+
+![Kiali display selection](images/kiali6.png "Kiali display selection")
 
 ![Service Mesh observability](images/kiali3.png "Service Mesh observability")
