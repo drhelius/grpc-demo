@@ -76,6 +76,8 @@ Note that, for simplicity, the operator is only provided for deploying the demo 
 
 ![Helm Release](images/helm.png "Helm Release")
 
+*This section explains how to create a Helm Chart. If you want to use the Charts provided in the demo go straight to [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio) or [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio) sections.*
+
 Helm Charts are an easy and powerful way to deploy your services.
 
 In this demo there are two different charts provided for deploying the services both with Istio and without it:
@@ -152,6 +154,8 @@ $ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
 
 ## 4 - Creating an OpenShift Template for deploying services
 
+*This section explains how to create an OpenShift Template. If you want to use the templates provided in the demo go straight to [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio) or [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio) sections.*
+
 OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
 
 These templates can be parameterized but the lack of dynamism (loops and conditionals) usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
@@ -177,19 +181,23 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
+*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio).*
+
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
 - [grpc-demo-operator](https://github.com/drhelius/grpc-demo-operator)
 
 This is convenient for this demo as you will create and manage a simple CRD for deploying all together. In real life though, you may want to isolate each service lifecycle by deploying them independently. An Operator may not be the best solution for deploying services, this Operator is provided for demonstration purposes.
 
+The operator in this demo can only deploy the services without using Istio. Creating Istio custom resources within a Go Operator is more complex and it has been omitted for simplicity. If you are interested, have a look at the Istio [client-go](https://github.com/istio/client-go) project:
+
 A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily.
 
 There are three ways to create an Operator using the Operator SDK: Helm, Ansible and Go. The operator in this demo is written in Go. Given the three options, Go is the most powerful but also the most complex of the three.
 
-If you want to create a new Operator follow this steps:
+These are the steps followed to create the Operator provided:
 
- - Start by installing the Operator SDK by following the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
+ - Start by installing the Operator SDK and follow the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
 
 - Create a new project. Note that we use `example.com` to group our CRDs.
 ```bash
