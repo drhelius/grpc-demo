@@ -18,6 +18,19 @@ For deployment, three different mechanisms are provided. You can also choose wet
 
 All the examples are provided for Red Hat OpenShift but could be applied to any Kubernetes distribution. If you want to run OpenShift on your laptop you may want to try [Red Hat CodeReady Containers](https://developers.redhat.com/products/codeready-containers/overview).
 
+## Components
+
+- Services
+  - [Protobuf Repo](https://github.com/drhelius/grpc-demo-proto)
+  - [Account Service](https://github.com/drhelius/grpc-demo-account)
+  - [Order Service](https://github.com/drhelius/grpc-demo-order)
+  - [Product Service](https://github.com/drhelius/grpc-demo-product)
+  - [Order Service](https://github.com/drhelius/grpc-demo-order)
+- Deployment
+  - [Helm Charts](helm-charts)
+  - [Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator)
+  - [OpenShift Templates](https://github.com/drhelius/grpc-demo)
+
 ## Index
 
 1. [Architecture](#1---architecture)
