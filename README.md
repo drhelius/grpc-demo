@@ -189,7 +189,7 @@ In this demo, a Kubernetes Operator is provided in order to deploy all four serv
 
 This is convenient for this demo as you will create and manage a simple CRD for deploying all together. In real life though, you may want to isolate each service lifecycle by deploying them independently. An Operator may not be the best solution for deploying services, this Operator is provided for demonstration purposes.
 
-The operator in this demo can only deploy the services without using Istio. Creating Istio custom resources within a Go Operator is more complex and it has been omitted for simplicity. If you are interested, have a look at the [Istio client-go](https://github.com/istio/client-go) project:
+The operator in this demo can only deploy the services without using Istio. Creating Istio custom resources within a Go Operator is more complex and it has been omitted for simplicity. If you are interested, have a look at the [Istio client-go](https://github.com/istio/client-go) project.
 
 A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily.
 
