@@ -25,11 +25,13 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
   - [Account Service](https://github.com/drhelius/grpc-demo-account)
   - [Order Service](https://github.com/drhelius/grpc-demo-order)
   - [Product Service](https://github.com/drhelius/grpc-demo-product)
-  - [Order Service](https://github.com/drhelius/grpc-demo-order)
+  - [User Service](https://github.com/drhelius/grpc-demo-user)
 - Deployment
   - [Helm Charts](helm-charts)
   - [Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator)
-  - [OpenShift Templates](https://github.com/drhelius/grpc-demo)
+  - [OpenShift Templates](openshift-templates)
+- Istio
+  - [Service Mesh Control Plane](openshift-service-mesh)
 
 ## Index
 
