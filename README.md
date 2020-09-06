@@ -18,7 +18,20 @@ For deployment, three different mechanisms are provided. You can also choose wet
 
 All the examples are provided for Red Hat OpenShift but could be applied to any Kubernetes distribution. If you want to run OpenShift on your laptop you may want to try [Red Hat CodeReady Containers](https://developers.redhat.com/products/codeready-containers/overview).
 
-## Components
+## Index
+
+1. [Components](#1---components)
+2. [Architecture](#2---architecture)
+3. [Writing gRPC services in Go](#3---writing-grpc-services-in-go)
+4. [Creating a Helm Chart for deploying services](#4---creating-a-helm-chart-for-deploying-services)
+5. [Creating an OpenShift Template for deploying services](#5---creating-an-openshift-template-for-deploying-services)
+6. [Creating a Kubernetes Operator for deploying services](#6---creating-a-kubernetes-operator-for-deploying-services)
+7. [Installing Istio Service Mesh in OpenShift](#7---installing-istio-service-mesh-in-openshift)
+8. [Deploying the demo services using Istio](#8---deploying-the-demo-services-using-istio)
+9. [Deploying the demo services without using Istio](#9---deploying-the-demo-services-without-using-istio)
+10. [Observability with Kiali](#10---observability-with-kiali)
+
+## 1 - Components
 
 - Services
   - [Protobuf Repo](https://github.com/drhelius/grpc-demo-proto)
@@ -33,19 +46,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 - Istio
   - [Service Mesh Control Plane](openshift-service-mesh)
 
-## Index
-
-1. [Architecture](#1---architecture)
-2. [Writing gRPC services in Go](#2---writing-grpc-services-in-go)
-3. [Creating a Helm Chart for deploying services](#3---creating-a-helm-chart-for-deploying-services)
-4. [Creating an OpenShift Template for deploying services](#4---creating-an-openshift-template-for-deploying-services)
-5. [Creating a Kubernetes Operator for deploying services](#5---creating-a-kubernetes-operator-for-deploying-services)
-6. [Installing Istio Service Mesh in OpenShift](#6---installing-istio-service-mesh-in-openshift)
-7. [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio)
-8. [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio)
-9. [Observability with Kiali](#9---observability-with-kiali)
-
-## 1 - Architecture
+## 2 - Architecture
 
 ![Demo Services](images/architecture.png "Demo Services")
 
@@ -68,11 +69,11 @@ Three deployment methods are provided for demonstration purposes, you are not ex
 
 Note that, for simplicity, the operator is only provided for deploying the demo microservices without Istio.
 
-## 2 - Writing gRPC services in Go
+## 3 - Writing gRPC services in Go
 
 *TODO*
 
-## 3 - Creating a Helm Chart for deploying services
+## 4 - Creating a Helm Chart for deploying services
 
 ![Helm Release](images/helm.png "Helm Release")
 
@@ -152,7 +153,7 @@ $ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
 "grpc-demo" has been added to your repositories
 ```
 
-## 4 - Creating an OpenShift Template for deploying services
+## 5 - Creating an OpenShift Template for deploying services
 
 *This section explains how to create an OpenShift Template. If you want to use the templates provided in the demo go straight to [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio) or [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio) sections.*
 
@@ -177,7 +178,7 @@ The `APP_NAME` parameter is just an identifier to label all the manifests create
 
 The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
-## 5 - Creating a Kubernetes Operator for deploying services
+## 6 - Creating a Kubernetes Operator for deploying services
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
@@ -214,7 +215,7 @@ Recommended reads:
 - https://www.openshift.com/blog/kubernetes-operators-best-practices
 
 
-## 6 - Installing Istio Service Mesh in OpenShift
+## 7 - Installing Istio Service Mesh in OpenShift
 
 In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
 
@@ -286,7 +287,7 @@ kiali                    1/1     1            1           15d
 prometheus               1/1     1            1           41d
 ```
 
-## 7 - Deploying the demo services using Istio
+## 8 - Deploying the demo services using Istio
 
 Two methods are provided to deploy the demo services and setup the service mesh:
 
@@ -491,7 +492,7 @@ You can uninstall everything deployed by running:
 
 `$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
 
-## 8 - Deploying the demo services without using Istio
+## 9 - Deploying the demo services without using Istio
 
 Three methods are provided to deploy the demo services without using a service mesh:
 
@@ -829,7 +830,7 @@ $ oc delete services.grpcdemo.example.com example-services
 services.grpcdemo.example.com "example-services" deleted
 ```
 
-## 9 - Observability with Kiali
+## 10 - Observability with Kiali
 
 ![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
 
