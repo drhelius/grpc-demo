@@ -208,11 +208,11 @@ $ operator-sdk init --domain=example.com --repo=github.com/myaccount/myoperator
 ```
 
 Recommended reads:
-- https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/
-- https://developers.redhat.com/books/kubernetes-operators
-- https://developers.redhat.com/blog/2020/08/21/hello-world-tutorial-with-kubernetes-operators/
-- https://www.redhat.com/en/blog/kubernetes-operators-comes-great-responsibility
-- https://www.openshift.com/blog/kubernetes-operators-best-practices
+- [Golang Based Operator Tutorial](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/)
+- [Kubernetes Operators eBook](https://developers.redhat.com/books/kubernetes-operators)
+- ['Hello, World' tutorial with Kubernetes Operators](https://developers.redhat.com/blog/2020/08/21/hello-world-tutorial-with-kubernetes-operators/)
+- [With Kubernetes Operators comes great responsibility](https://www.redhat.com/en/blog/kubernetes-operators-comes-great-responsibility)
+- [Kubernetes Operators Best Practices](https://www.openshift.com/blog/kubernetes-operators-best-practices)
 
 
 ## 7 - Installing Istio Service Mesh in OpenShift
