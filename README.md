@@ -28,8 +28,8 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
   - [User Service](https://github.com/drhelius/grpc-demo-user)
 - Deployment
   - [Helm Charts](helm-charts)
-  - [Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator)
   - [OpenShift Templates](openshift-templates)
+  - [Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator)
 - Istio
   - [Service Mesh Control Plane](openshift-service-mesh)
 
@@ -181,7 +181,7 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
-*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio).*
+*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](deploy-the-services-using-a-kubernetes-operator).*
 
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
@@ -189,7 +189,7 @@ In this demo, a Kubernetes Operator is provided in order to deploy all four serv
 
 This is convenient for this demo as you will create and manage a simple CRD for deploying all together. In real life though, you may want to isolate each service lifecycle by deploying them independently. An Operator may not be the best solution for deploying services, this Operator is provided for demonstration purposes.
 
-The operator in this demo can only deploy the services without using Istio. Creating Istio custom resources within a Go Operator is more complex and it has been omitted for simplicity. If you are interested, have a look at the Istio [client-go](https://github.com/istio/client-go) project:
+The operator in this demo can only deploy the services without using Istio. Creating Istio custom resources within a Go Operator is more complex and it has been omitted for simplicity. If you are interested, have a look at the [Istio client-go](https://github.com/istio/client-go) project:
 
 A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily.
 
