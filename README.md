@@ -1,4 +1,4 @@
-# Istio gRPC Services Demo
+# Istio gRPC Golang Demo
 
 ---
 
