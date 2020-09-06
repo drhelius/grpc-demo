@@ -70,7 +70,7 @@ Note that, for simplicity, the operator is only provided for deploying the demo 
 
 ## 2 - Writing gRPC services in Go
 
-TODO
+*TODO*
 
 ## 3 - Creating a Helm Chart for deploying services
 
@@ -177,10 +177,34 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
-TODO
+In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
-https://developers.redhat.com/books/kubernetes-operators
-https://sdk.operatorframework.io/
+- [grpc-demo-operator](https://github.com/drhelius/grpc-demo-operator)
+
+This is convenient for this demo as you will create and manage a simple CRD for deploying all together. In real life though, you may want to isolate each service lifecycle by deploying them independently. An Operator may not be the best solution for deploying services, this Operator is provided for demonstration purposes.
+
+A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily.
+
+There are three ways to create an Operator using the Operator SDK: Helm, Ansible and Go. The operator in this demo is written in Go. Given the three options, Go is the most powerful but also the most complex of the three.
+
+If you want to create a new Operator follow this steps:
+
+ - Start by installing the Operator SDK by following the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
+
+- Create a new project. Note that we use `example.com` to group our CRDs.
+```bash
+$ mkdir -p $HOME/projects/myoperator
+$ cd $HOME/projects/myoperator
+$ operator-sdk init --domain=example.com --repo=github.com/myaccount/myoperator
+```
+
+Recommended reads:
+- https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/
+- https://developers.redhat.com/books/kubernetes-operators
+- https://developers.redhat.com/blog/2020/08/21/hello-world-tutorial-with-kubernetes-operators/
+- https://www.redhat.com/en/blog/kubernetes-operators-comes-great-responsibility
+- https://www.openshift.com/blog/kubernetes-operators-best-practices
+
 
 ## 6 - Installing Istio Service Mesh in OpenShift
 
