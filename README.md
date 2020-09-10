@@ -192,27 +192,245 @@ This is convenient for this demo as you will create and manage a simple CRD for 
 
 The operator in this demo can only deploy the services without using Istio. Creating Istio custom resources within a Go Operator is more complex and it has been omitted for simplicity. If you are interested, have a look at the [Istio client-go](https://github.com/istio/client-go) project.
 
-A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily.
+A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily. Check out the [docs](https://sdk.operatorframework.io/docs/) and don't miss the awesome free eBook about [Kubernetes Operators](https://developers.redhat.com/books/kubernetes-operators).
 
 There are three ways to create an Operator using the Operator SDK: Helm, Ansible and Go. The operator in this demo is written in Go. Given the three options, Go is the most powerful but also the most complex of the three.
 
-These are the steps followed to create the Operator provided:
-
- - Start by installing the Operator SDK and follow the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
-
-- Create a new project. Note that we use `example.com` to group our CRDs.
-```bash
-$ mkdir -p $HOME/projects/myoperator
-$ cd $HOME/projects/myoperator
-$ operator-sdk init --domain=example.com --repo=github.com/myaccount/myoperator
-```
-
-Recommended reads:
+Recommended reads before proceeding:
 - [Golang Based Operator Tutorial](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/)
-- [Kubernetes Operators eBook](https://developers.redhat.com/books/kubernetes-operators)
 - ['Hello, World' tutorial with Kubernetes Operators](https://developers.redhat.com/blog/2020/08/21/hello-world-tutorial-with-kubernetes-operators/)
 - [With Kubernetes Operators comes great responsibility](https://www.redhat.com/en/blog/kubernetes-operators-comes-great-responsibility)
 - [Kubernetes Operators Best Practices](https://www.openshift.com/blog/kubernetes-operators-best-practices)
+
+These are the steps followed to create the Operator provided in this demo:
+
+- Install the Operator SDK following the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
+
+- Create a new project. Note that we use `example.com` to group our CRDs:
+
+```bash
+$ mkdir -p $HOME/projects/grpc-demo-operator
+$ cd $HOME/projects/grpc-demo-operator
+$ operator-sdk init --domain=example.com --repo=github.com/drhelius/grpc-demo-operator
+```
+
+- Create a new Custom Resource Definition (CRD) with version `v1` and Kind `DemoServices`:
+
+```bash
+$ operator-sdk create api --group grpcdemo --version v1 --kind DemoServices --resource=true --controller=true
+```
+
+- Now you can define the API. The Custom Resource (CR) in this demo defines the services we want to deploy and their resources. It looks like this:
+
+```yaml
+apiVersion: grpcdemo.example.com/v1
+kind: DemoServices
+metadata:
+  name: example-services
+spec:
+  services:
+    - name: account
+      image: quay.io/isanchez/grpc-demo-account
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+    - name: order
+      image: quay.io/isanchez/grpc-demo-order
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+    - name: product
+      image: quay.io/isanchez/grpc-demo-product
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+    - name: user
+      image: quay.io/isanchez/grpc-demo-user
+      version: v1.0.0
+      replicas: 1
+      limits:
+        memory: 200Mi
+        cpu: "0.5"
+      requests:
+        memory: 100Mi
+        cpu: "0.1"
+```
+
+- To achive this data structure you can model it in Go like this:
+
+```go
+// DemoServicesSpec defines the desired state of DemoServices
+type DemoServicesSpec struct {
+	Services []Service `json:"services"`
+}
+
+// Service defines the desired state of a Service
+type Service struct {
+	Name     string    `json:"name"`
+	Image    string    `json:"image"`
+	Version  string    `json:"version"`
+	Replicas int32     `json:"replicas"`
+	Limits   Resources `json:"limits"`
+	Requests Resources `json:"requests"`
+}
+
+// Resources defines the desired resources for limits and requests
+type Resources struct {
+	CPU    string `json:"cpu"`
+	Memory string `json:"memory"`
+}
+```
+
+- After modifying the `*_types.go` file always run the following command to update the generated code for that resource type:
+
+```bash
+$ make generate
+```
+
+- Depending on what you want to achieve you will watch a *primary* resource and some *secondary* ones. You can also add predicates to choose what will trigger the reconciler and what will not:
+
+```go
+predCR := predicate.Funcs{
+	UpdateFunc: func(e event.UpdateEvent) bool {
+		// Ignore updates to CR status in which case metadata.Generation does not change
+		return e.MetaOld.GetGeneration() != e.MetaNew.GetGeneration()
+	},
+}
+  
+err = c.Watch(&source.Kind{Type: &grpcdemov1.DemoServices{}}, &handler.EnqueueRequestForObject{}, predCR)
+if err != nil {
+	return err
+}
+
+...
+
+h := &handler.EnqueueRequestForOwner{
+	IsController: true,
+	OwnerType:    &grpcdemov1.DemoServices{},
+}
+
+predDeployment := predicate.Funcs{
+	CreateFunc: func(e event.CreateEvent) bool {
+		return false
+	},
+	UpdateFunc: func(e event.UpdateEvent) bool {
+    // Ignore updates to CR status in which case metadata.Generation does not change
+		return e.MetaOld.GetGeneration() != e.MetaNew.GetGeneration()
+	},
+}
+
+err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, h, predDeployment)
+if err != nil {
+	return err
+}
+  
+```
+
+- You can then add the logic of the controller. The controller in this demo will watch for `DemoService` CR changes and will deploy any microservice defined in it. Additionally, it will watch secondary objects like `Deployments`, `Routes`, and `Services` to see if they are in the desired state defined in the CR. It will also delete any orphaned object not owned by any microservice that may be deleted in the `DemoService` CR:
+
+```go
+func (r *DemoServicesReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	//_ = context.Background()
+
+	reqLogger := r.Log.WithValues("req.Namespace", req.Namespace, "req.Name", req.Name)
+
+	reqLogger.Info("Reconciling Services")
+
+	instance := &grpcdemov1.DemoServices{}
+	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return reconcile.Result{}, nil
+		}
+		return reconcile.Result{}, err
+	}
+
+	for _, srv := range instance.Spec.Services {
+		err := r.manageDeployment(instance, srv, reqLogger)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		err = r.manageService(instance, srv, reqLogger)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+
+		err = r.manageRoute(instance, srv, reqLogger)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+	}
+
+	err = r.deleteOrphanedDeployments(instance, reqLogger)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	err = r.deleteOrphanedServices(instance, reqLogger)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	err = r.deleteOrphanedRoutes(instance, reqLogger)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	return ctrl.Result{}, nil
+}
+```
+
+- Build the operator and generate an image. Make sure you have access to the image repository in order to push it. Here is an example with [Quay](https://quay.io/):
+
+```shell
+$ make docker-build docker-push IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
+```
+
+- Before running the operator, the CRD must be registered with the Kubernetes apiserver. This will *install* the CRD in your cluster using `kubectl`:
+
+```shell
+$ make install
+```
+
+- In this demo the operator is run in the `grpc-demo` namespace which can be specified for all resources in `config/default/kustomization.yaml`:
+
+```shell
+$ cd config/default/ && kustomize edit set namespace "grpc-demo" && cd ../..
+```
+
+- This operator is a namespace-scoped operator. It will watch for CR changes within a namespace. You can provide the namespace or namespaces to watch using the `WATCH_NAMESPACE` env var in the operator `Deployment` manifest. In this demo the current namespece where the operator is running is selected as the namespace to be watched:
+
+```yaml
+env:
+- name: WATCH_NAMESPACE
+  valueFrom:
+    fieldRef:
+      fieldPath: metadata.namespace
+```
+
+- Run the following to deploy the operator. This will also install the RBAC manifests from config/rbac.
+
+```shell
+$ make deploy IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
+```
+
+
 
 
 ## 7 - Installing Istio Service Mesh in OpenShift
