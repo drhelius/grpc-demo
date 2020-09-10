@@ -6,7 +6,7 @@ STILL IN DEVELOPMENT
 
 ---
 
-![](images/kiali3.png)
+![Istio gRPC Golang Demo](images/kiali3.png)
 
 This is a demo to showcase the features of some of the technologies that may be involved in modern microservice development and operation within a Kubernetes platform.
 
@@ -71,7 +71,7 @@ Note that, for simplicity, the operator is only provided for deploying the demo 
 
 ## 3 - Writing gRPC services in Go
 
-*TODO*
+TODO
 
 ## 4 - Creating a Helm Chart for deploying services
 
@@ -197,6 +197,7 @@ A nice way to create an Operator is by using the [Operator SDK](https://sdk.oper
 There are three ways to create an Operator using the Operator SDK: Helm, Ansible and Go. The operator in this demo is written in Go. Given the three options, Go is the most powerful but also the most complex of the three.
 
 Recommended reads before proceeding:
+
 - [Golang Based Operator Tutorial](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/)
 - ['Hello, World' tutorial with Kubernetes Operators](https://developers.redhat.com/blog/2020/08/21/hello-world-tutorial-with-kubernetes-operators/)
 - [With Kubernetes Operators comes great responsibility](https://www.redhat.com/en/blog/kubernetes-operators-comes-great-responsibility)
@@ -271,7 +272,7 @@ spec:
         cpu: "0.1"
 ```
 
-- To achive this data structure you can model it in Go like this:
+- This data structure can modeled in Go like this:
 
 ```go
 // DemoServicesSpec defines the desired state of DemoServices
@@ -414,7 +415,7 @@ $ make install
 $ cd config/default/ && kustomize edit set namespace "grpc-demo" && cd ../..
 ```
 
-- This operator is a namespace-scoped operator. It will watch for CR changes within a namespace. You can provide the namespace or namespaces to watch using the `WATCH_NAMESPACE` env var in the operator `Deployment` manifest. In this demo the current namespece where the operator is running is selected as the namespace to be watched:
+- This operator is a namespace-scoped operator. It will watch for CR changes within a namespace. You can provide the namespace or namespaces to watch using the `WATCH_NAMESPACE` env var in the operator `Deployment` manifest. In this demo the current namespace where the operator is running is selected as the namespace to be watched:
 
 ```yaml
 env:
@@ -429,9 +430,6 @@ env:
 ```shell
 $ make deploy IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
 ```
-
-
-
 
 ## 7 - Installing Istio Service Mesh in OpenShift
 
