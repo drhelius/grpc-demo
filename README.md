@@ -409,7 +409,7 @@ $ make docker-build docker-push IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
 $ make install
 ```
 
-- In this demo the operator is run in the `grpc-demo` namespace which can be specified for all resources in `config/default/kustomization.yaml`:
+- This operator is expected to be run in the `grpc-demo` namespace. You can change it for all resources in `config/default/kustomization.yaml`:
 
 ```shell
 $ cd config/default/ && kustomize edit set namespace "grpc-demo" && cd ../..
