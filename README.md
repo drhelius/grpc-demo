@@ -277,7 +277,9 @@ spec:
         cpu: "0.1"
 ```
 
-- The API is defined in the [`api/v1/demoservices_types.go`](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go) file:
+For each service defined in this CR, the operator will create a `Deployment`, a `Service` and `Route`. This will make each microservice available in our cluster to be consumed.
+
+- The API for the CR is defined in the [`api/v1/demoservices_types.go`](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go) file:
 
 ```go
 // DemoServicesSpec defines the desired state of DemoServices
