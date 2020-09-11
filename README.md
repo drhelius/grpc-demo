@@ -28,7 +28,12 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 6. [Creating a Kubernetes Operator for deploying services](#6---creating-a-kubernetes-operator-for-deploying-services)
 7. [Installing Istio Service Mesh in OpenShift](#7---installing-istio-service-mesh-in-openshift)
 8. [Deploying the demo services using Istio](#8---deploying-the-demo-services-using-istio)
+    1. [With a Helm Chart](#deploy-the-services-using-a-helm-chart)
+    2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template)
 9. [Deploying the demo services without using Istio](#9---deploying-the-demo-services-without-using-istio)
+    1. [With a Helm Chart](#deploy-the-services-using-a-helm-chart-without-istio)
+    2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template-wihout-istio)
+    3. [With a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator-wihout-istio)
 10. [Observability with Kiali](#10---observability-with-kiali)
 
 ## 1 - Components
@@ -182,7 +187,7 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
-*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](README.md#deploy-the-services-using-a-kubernetes-operator).*
+*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator).*
 
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
@@ -722,7 +727,7 @@ You can have the demo services deployed both with Istio and without it at the sa
 
 `$ oc new-project grpc-demo`
 
-### Deploy the services using a Helm Chart
+### Deploy the services using a Helm Chart without Istio
 
 If you wish to use the [provided Helm Chart](helm-charts/grpc-demo-services/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
 
@@ -842,7 +847,7 @@ You can uninstall everything deployed by running:
 
 `$ helm uninstall grpc-demo`
 
-### Deploy the services using an OpenShift template
+### Deploy the services using an OpenShift template wihout Istio
 
 If you wish to use the [provided OpenShift template](openshift-templates/grpc-demo-template.yaml) to deploy the demo services and all required manifests follow this steps.
 
@@ -911,7 +916,7 @@ You can uninstall everything deployed by running:
 
 `$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
 
-### Deploy the services using a Kubernetes Operator
+### Deploy the services using a Kubernetes Operator without Istio
 
 If you wish to use the [provided Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator) to deploy the demo services and all required manifests follow this steps.
 
