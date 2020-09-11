@@ -342,7 +342,7 @@ if err != nil {
   
 ```
 
-- You can then add the logic of the controller. The controller in this demo will watch for `DemoService` CR changes and will deploy any microservice defined in it. Additionally, it will watch secondary objects like `Deployments`, `Routes`, and `Services` to see if they are in the desired state defined in the CR. It will also delete any orphaned object not owned by any microservice that may be deleted in the `DemoService` CR:
+- You can then add the logic of the controller. The controller in this demo will watch for `DemoServices` CR changes and will deploy any microservice defined in it. Additionally, it will watch secondary objects like `Deployments`, `Routes`, and `Services` to see if they are in the desired state defined in the CR. It will also delete any orphaned object not owned by any microservice that may be deleted in the `DemoService` CR:
 
 ```go
 func (r *DemoServicesReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
@@ -415,7 +415,7 @@ $ make install
 $ cd config/default/ && kustomize edit set namespace "grpc-demo" && cd ../..
 ```
 
-- This operator is a namespace-scoped operator. It will watch for CR changes within a namespace. You can provide the namespace or namespaces to watch using the `WATCH_NAMESPACE` env var in the operator `Deployment` manifest. In this demo the current namespace where the operator is running is selected as the namespace to be watched:
+- This operator is a namespace-scoped operator. It will watch for CR changes within a namespace. You can provide the namespace to watch using the `WATCH_NAMESPACE` env var in the [operator Deployment manifest](https://github.com/drhelius/grpc-demo-operator/blob/master/config/manager/manager.yaml). In this demo the namespace to be watched is the same as the namespace where the operator is running:
 
 ```yaml
 env:
@@ -425,7 +425,7 @@ env:
       fieldPath: metadata.namespace
 ```
 
-- Run the following to deploy the operator. This will also install the RBAC manifests from config/rbac.
+- Run the following to deploy the operator. This will also install the RBAC manifests from [config/rbac](https://github.com/drhelius/grpc-demo-operator/tree/master/config/rbac).
 
 ```shell
 $ make deploy IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
