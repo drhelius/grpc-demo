@@ -272,7 +272,7 @@ spec:
         cpu: "0.1"
 ```
 
-- The api is define in the `api/v1/demoservices_types.go` [file](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go):
+- The API is defined in the `api/v1/demoservices_types.go` [file](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go):
 
 ```go
 // DemoServicesSpec defines the desired state of DemoServices
@@ -297,13 +297,13 @@ type Resources struct {
 }
 ```
 
-- After modifying the `*_types.go` file always run the following command to update the generated code for that resource type:
+- After modifying any `*_types.go` files always run the following command to update the generated code for that resource type:
 
 ```bash
 $ make generate
 ```
 
-- Depending on what you want to achieve you will watch a *primary* resource and some *secondary* ones. You can also add predicates to choose what will trigger the reconciler and what will not:
+- Depending on what you want to achieve you will watch a *primary* resource and some *secondary* ones. You can also add predicates to choose what will trigger the reconciler and what will not. This operator watches `DemoServices` as the primary resource. Additionaly it watches `Deployments`, `Services` and `Routes` as secondary resources:
 
 ```go
 predCR := predicate.Funcs{
@@ -342,7 +342,7 @@ if err != nil {
   
 ```
 
-- You can then add the logic of the controller. The controller in this demo will watch for `DemoServices` CR changes and will deploy any microservice defined in it. Additionally, it will watch secondary objects like `Deployments`, `Routes`, and `Services` to see if they are in the desired state defined in the CR. It will also delete any orphaned object not owned by any microservice that may be deleted in the `DemoService` CR:
+- You can then add the logic of the controller. The controller in this operator will trigger a *reconcile* when the primary watched resource changes. Then, it will keep the state  defined in it. Additionally, it will trigger when any of the secondary watched resources change, like `Deployments`, `Routes`, and `Services` to also check if they are in the desired state. Finally, it will delete any orphaned resource not owned by any microservice that may be removed from the `DemoService` CR:
 
 ```go
 func (r *DemoServicesReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
