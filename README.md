@@ -481,12 +481,12 @@ Once the project is ready you can create the control plane.
 
 A Service Mesh Control Plane manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
 
-`$ oc create -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
+`$ kubectl apply -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
 
 Istio operator will then create all the deployments that conform the control plane. After a few minutes it should look like this:
 
 ```bash
-$ oc get deployments -n istio-system
+$ kubectl get deployments -n istio-system
 NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
 grafana                  1/1     1            1           41d
 ior                      1/1     1            1           41d
@@ -522,7 +522,7 @@ A Service Mesh Member Roll manifest is [provided in this repo](openshift-service
 
 Use it to create the Member Roll:
 
-`$ oc create -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
+`$ kubectl apply -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
 
 ### Deploy the services using a Helm Chart
 
@@ -622,7 +622,7 @@ Install the chart using a custom *Account* route:
 After a few minutes the services should be up an running:
 
 ```bash
-$ oc get deployments
+$ kubectl get deployments
 NAME             READY   UP-TO-DATE   AVAILABLE   AGE
 account-v1.0.0   1/1     1            1           3m1s
 order-v1.0.0     1/1     1            1           3m1s
@@ -649,7 +649,7 @@ Make sure you are working with the right namespace:
 Add the template to your project:
 
 ```bash
-$ oc create -f openshift-templates/grpc-demo-template-istio.yaml
+$ oc apply -f openshift-templates/grpc-demo-template-istio.yaml
 template.template.openshift.io/grpc-demo-istio created
 
 $ oc get template
@@ -664,7 +664,7 @@ You can now use the Web Console to create all the services using this template:
 You can also use the cli:
 
 ```bash
-$ oc process -f openshift-templates/grpc-demo-template-istio.yaml -p ACCOUNT_ROUTE=account-grpc-demo.mycluster.com | oc create -f -
+$ oc process -f openshift-templates/grpc-demo-template-istio.yaml -p ACCOUNT_ROUTE=account-grpc-demo.mycluster.com | oc apply -f -
 deployment.apps/account-v1.0.0 created
 service/account created
 virtualservice.networking.istio.io/account created
@@ -853,7 +853,7 @@ Make sure you are working with the right namespace:
 Add the template to your project:
 
 ```bash
-$ oc create -f openshift-templates/grpc-demo-template.yaml
+$ oc apply -f openshift-templates/grpc-demo-template.yaml
 template.template.openshift.io/grpc-demo created
 
 $ oc get template
@@ -866,7 +866,7 @@ You can now use the Web Console to create all the services using this template:
 You can also use the cli:
 
 ```bash
-$ oc process -f openshift-templates/grpc-demo-template.yaml | oc create -f -
+$ oc process -f openshift-templates/grpc-demo-template.yaml | oc apply -f -
 deployment.apps/account-v1.0.0 created
 service/account created
 route.route.openshift.io/account created
@@ -922,7 +922,7 @@ $ git clone https://github.com/drhelius/grpc-demo-operator.git
 $ cd grpc-demo-operator
 ```
 
-Make sure you are working with the right namespace:
+Make sure you are working with the right namespace. The operator will run in the `grpc-demo` namespace by default:
 
 `$ oc project grpc-demo`
 
@@ -931,34 +931,25 @@ The repository you just cloned has a [Makefile](https://github.com/drhelius/grpc
 Run this to deploy the operator, CRDs and required configuration:
 
 ```bash
-$ make setup
-kubectl apply -f deploy/crds/grpcdemo.example.com_services_crd.yaml
-customresourcedefinition.apiextensions.k8s.io/services.grpcdemo.example.com created
-kubectl apply -f deploy/service_account.yaml
-serviceaccount/grpc-demo-operator created
-kubectl apply -f deploy/role.yaml
-role.rbac.authorization.k8s.io/grpc-demo-operator created
-kubectl apply -f deploy/role_binding.yaml
-rolebinding.rbac.authorization.k8s.io/grpc-demo-operator created
-kubectl apply -f deploy/operator.yaml
-deployment.apps/grpc-demo-operator created
+$ make install
+$ make deploy IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
 ```
 
 Make sure the operator is running fine:
 
 ```bash
-$ oc get deployment grpc-demo-operator
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-grpc-demo-operator   1/1     1            1           2m56s
+$ kubectl get deployment grpc-demo-operator-controller-manager
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+grpc-demo-operator-controller-manager   1/1     1            1           2m56s
 ```
 
-The operator is watching custom resources with kind `services.grpcdemo.example.com`.
+The operator is watching custom resources with kind `demoservices.grpcdemo.example.com`.
 
 Now you can create your own [custom resource](https://github.com/drhelius/grpc-demo-operator/blob/master/deploy/crds/example_cr.yaml) to instruct the operator to create the demo services:
 
 ```yaml
 apiVersion: grpcdemo.example.com/v1
-kind: Services
+kind: DemoServices
 metadata:
   name: example-services
 spec:
@@ -1008,26 +999,26 @@ spec:
 Create the custom resource by using the provided example:
 
 ```bash
-$ oc create -f deploy/crds/example_cr.yaml
-services.grpcdemo.example.com/example-services created
+$ kubectl apply -f config/samples/grpcdemo_v1_demoservices.yaml
+demoservices.grpcdemo.example.com/example-services created
 ```
 
 After a few minutes the operator should have created all the required objects and the services should be up an running:
 
 ```bash
-$ oc get deployment
-NAME                 READY   UP-TO-DATE   AVAILABLE   AGE
-account              1/1     1            1           2m14s
-grpc-demo-operator   1/1     1            1           14m
-order                1/1     1            1           2m14s
-product              1/1     1            1           2m13s
-user                 1/1     1            1           2m13s
+$ kubectl get deployment
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+account                                 1/1     1            1           2m14s
+grpc-demo-operator-controller-manager   1/1     1            1           14m
+order                                   1/1     1            1           2m14s
+product                                 1/1     1            1           2m13s
+user                                    1/1     1            1           2m13s
 ```
 
 An HTTP route for every service is automatically created:
 
 ```bash
-$ oc get route
+$ kubectl get route
 NAME      HOST/PORT                                     PATH   SERVICES   PORT   TERMINATION   WILDCARD
 account   account-grpc-demo.apps.mycluster.com                 account    http                 None
 order     order-grpc-demo.apps.mycluster.com                   order      http                 None
@@ -1035,15 +1026,15 @@ product   product-grpc-demo.apps.mycluster.com                 product    http  
 user      user-grpc-demo.apps.mycluster.com                    user       http                 None
 ```
 
-You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be gRPC:
 
 `$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
 
 You can uninstall the services by deleting the custom resource and the operator will delete all of them for you:
 
 ```bash
-$ oc delete services.grpcdemo.example.com example-services
-services.grpcdemo.example.com "example-services" deleted
+$ kubectl delete demoservices.grpcdemo.example.com example-services
+demoservices.grpcdemo.example.com "example-services" deleted
 ```
 
 ## 10 - Observability with Kiali
@@ -1055,7 +1046,7 @@ Once you have Istio and the demo services up and running you can observe what is
 First, you need the Kiali route to access the web console:
 
 ```bash
-$ oc get routes -n istio-system
+$ kubectl get routes -n istio-system
 NAME                            HOST/PORT                                                     PATH   SERVICES               PORT    TERMINATION          WILDCARD
 grafana                         grafana-istio-system.apps.mycluster.com                              grafana                <all>   reencrypt            None
 grpc-demo-istio-account-mjs5x   account-grpc-demo-istio-system.apps.mycluster.com                    istio-ingressgateway   http2                        None
