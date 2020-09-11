@@ -272,7 +272,7 @@ spec:
         cpu: "0.1"
 ```
 
-- This data structure can modeled in Go like this:
+- This data structure looks like this in Go:
 
 ```go
 // DemoServicesSpec defines the desired state of DemoServices
