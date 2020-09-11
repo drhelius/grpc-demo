@@ -32,8 +32,8 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
     2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template)
 9. [Deploying the demo services without using Istio](#9---deploying-the-demo-services-without-using-istio)
     1. [With a Helm Chart](#deploy-the-services-using-a-helm-chart-without-istio)
-    2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template-wihout-istio)
-    3. [With a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator-wihout-istio)
+    2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template-without-istio)
+    3. [With a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator-without-istio)
 10. [Observability with Kiali](#10---observability-with-kiali)
 
 ## 1 - Components
@@ -847,7 +847,7 @@ You can uninstall everything deployed by running:
 
 `$ helm uninstall grpc-demo`
 
-### Deploy the services using an OpenShift template wihout Istio
+### Deploy the services using an OpenShift template without Istio
 
 If you wish to use the [provided OpenShift template](openshift-templates/grpc-demo-template.yaml) to deploy the demo services and all required manifests follow this steps.
 
