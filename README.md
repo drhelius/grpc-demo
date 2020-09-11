@@ -945,7 +945,7 @@ grpc-demo-operator-controller-manager   1/1     1            1           2m56s
 
 The operator is watching custom resources with kind `demoservices.grpcdemo.example.com`.
 
-Now you can create your own [custom resource](https://github.com/drhelius/grpc-demo-operator/blob/master/deploy/crds/example_cr.yaml) to instruct the operator to create the demo services:
+Now you can create your own [custom resource](https://github.com/drhelius/grpc-demo-operator/blob/master/config/samples/grpcdemo_v1_demoservices.yaml) to instruct the operator to create the demo services:
 
 ```yaml
 apiVersion: grpcdemo.example.com/v1
