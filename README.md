@@ -928,7 +928,7 @@ Make sure you are working with the right namespace. The operator will run in the
 
 The repository you just cloned has a [Makefile](https://github.com/drhelius/grpc-demo-operator/blob/master/Makefile) to assist in some operations.
 
-Run this to deploy the operator, CRDs and required configuration:
+Run this to build and deploy the operator, the CRDs and all required manifests like RBAC configuration:
 
 ```bash
 $ make install
