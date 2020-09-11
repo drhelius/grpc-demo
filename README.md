@@ -277,7 +277,7 @@ spec:
         cpu: "0.1"
 ```
 
-- The API is defined in the `api/v1/demoservices_types.go` [file](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go):
+- The API is defined in the [`api/v1/demoservices_types.go`](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go) file:
 
 ```go
 // DemoServicesSpec defines the desired state of DemoServices
