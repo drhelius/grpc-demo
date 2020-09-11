@@ -182,7 +182,7 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
-*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](README.md#deploy-the-services-using-a-kubernetes-operator deploy-the-services-using-a-kubernetes-operator).*
+*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](README.md#deploy-the-services-using-a-kubernetes-operator).*
 
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
