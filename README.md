@@ -272,7 +272,7 @@ spec:
         cpu: "0.1"
 ```
 
-- This data structure looks like this in Go:
+- The api is define in the `api/v1/demoservices_types.go` [file](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go):
 
 ```go
 // DemoServicesSpec defines the desired state of DemoServices
