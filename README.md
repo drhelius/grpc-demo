@@ -82,7 +82,7 @@ TODO
 
 ![Helm Release](images/helm.png "Helm Release")
 
-*This section explains how to create a Helm Chart. If you want to use the Charts provided in the demo go straight to [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio) or [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio) sections.*
+> This section explains how to create a Helm Chart. If you want to use the Charts provided in the demo go straight to [Deploy the services with a Helm Chart using Istio](#deploy-the-services-using-a-helm-chart) or [Deploy the services with a Helm Chart without using Istio](#deploy-the-services-using-a-helm-chart-without-istio) sections.
 
 Helm Charts are an easy and powerful tool to deploy your services.
 
@@ -160,8 +160,8 @@ $ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
 
 ## 5 - Creating an OpenShift Template for deploying services
 
-*This section explains how to create an OpenShift Template. If you want to use the templates provided in the demo go straight to [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio) or [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio) sections.*
-
+> This section explains how to create an OpenShift Template. If you want to use the templates provided in the demo go straight to [Deploy the services with an OpenShift Template using Istio](#deploy-the-services-using-an-openshift-template) or [Deploy the services with an OpenShift Template without using Istio](#deploy-the-services-using-an-openshift-template-without-istio) sections.
+    
 OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
 
 These templates can be parameterized but the lack of dynamism (loops and conditionals) usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
@@ -187,7 +187,7 @@ The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUT
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
-*This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator).*
+> This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator).
 
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
