@@ -79,7 +79,7 @@ TODO
 
 *This section explains how to create a Helm Chart. If you want to use the Charts provided in the demo go straight to [Deploying the demo services using Istio](#7---deploying-the-demo-services-using-istio) or [Deploying the demo services without using Istio](#8---deploying-the-demo-services-without-using-istio) sections.*
 
-Helm Charts are an easy and powerful way to deploy your services.
+Helm Charts are an easy and powerful tool to deploy your services.
 
 In this demo there are two different charts provided for deploying the services both with Istio and without it:
 
