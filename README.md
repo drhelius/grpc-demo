@@ -919,6 +919,10 @@ $ git clone https://github.com/drhelius/grpc-demo-operator.git
 $ cd grpc-demo-operator
 ```
 
+Create a project to deploy the demo services if you haven't done so:
+
+`$ oc new-project grpc-demo`
+
 Make sure you are working with the right namespace. The operator will run in the `grpc-demo` namespace by default:
 
 `$ oc project grpc-demo`
