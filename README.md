@@ -22,19 +22,18 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 1. [Components](#1---components)
 2. [Architecture](#2---architecture)
-3. [Writing gRPC services in Go](#3---writing-grpc-services-in-go)
-4. [Creating a Helm Chart for deploying services](#4---creating-a-helm-chart-for-deploying-services)
-5. [Creating an OpenShift Template for deploying services](#5---creating-an-openshift-template-for-deploying-services)
-6. [Creating a Kubernetes Operator for deploying services](#6---creating-a-kubernetes-operator-for-deploying-services)
-7. [Installing Istio Service Mesh in OpenShift](#7---installing-istio-service-mesh-in-openshift)
-8. [Deploying the demo services using Istio](#8---deploying-the-demo-services-using-istio)
-    1. [With a Helm Chart](#deploy-the-services-using-a-helm-chart)
-    2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template)
-9. [Deploying the demo services without using Istio](#9---deploying-the-demo-services-without-using-istio)
-    1. [With a Helm Chart](#deploy-the-services-using-a-helm-chart-without-istio)
-    2. [With an OpenShift Template](#deploy-the-services-using-an-openshift-template-without-istio)
-    3. [With a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator-without-istio)
-10. [Observability with Kiali](#10---observability-with-kiali)
+3. [gRPC services in Go](#3---grpc-services-in-go)
+4. [Istio Service Mesh in OpenShift](#7---istio-service-mesh-in-openshift)
+5. [Helm Charts](#4---helm-charts)
+    - [Packaging and distributing a Helm Chart](#packaging-and-distributing-a-helm-chart)
+    - [Deploy the demo using a Helm Chart (with Istio)](#deploy-the-demo-using-a-helm-chart-istio)
+    - [Deploy the demo using a Helm Chart (without Istio)](#deploy-the-services-using-a-helm-chart-without-istio)
+6. [OpenShift Templates](#5---openshift-templates)
+    - [Deploy the demo using an OpenShift Template (with Istio)](#deploy-the-services-using-an-openshift-template)
+    - [Deploy the demo using an OpenShift Template (without Istio)](#deploy-the-services-using-an-openshift-template-without-istio)
+7. [Kubernetes Operators](#6---kubernetes-operators)
+    - [Deploy the demo using a Kubernetes Operator (without Istio)](#deploy-the-services-using-a-kubernetes-operator-without-istio)   
+8. [Observability with Kiali](#10---observability-with-kiali)
 
 ## 1 - Components
 
@@ -62,7 +61,7 @@ This demo is composed of four microservices modeling how a customer buy products
 - [User](https://github.com/drhelius/grpc-demo-user): The user personal information.
 - [Product](https://github.com/drhelius/grpc-demo-product): A description of a product in the store including price an details.
 
-All four microservices are written in go using gRPC as the main communication framework. Additionally, an HTTP (REST) listener is also provided for each of them.
+All four microservices are written in Go using gRPC as the main communication framework. Additionally, an HTTP (REST) listener is also provided for each of them.
 
 The demo can be setup using Istio or without using it.
 
@@ -74,11 +73,85 @@ Three deployment methods are provided for demonstration purposes, you are not ex
 
 Note that, for simplicity, the operator is only provided for deploying the demo microservices without Istio.
 
-## 3 - Writing gRPC services in Go
+You can have the services deployed both with Istio and without it at the same time but you may want to deploy them in different namespaces.
+
+## 3 - gRPC services in Go
 
 TODO
 
-## 4 - Creating a Helm Chart for deploying services
+## 4 - Istio Service Mesh in OpenShift
+
+In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
+
+Istio in OpenShift is installed by running a set of operators. Before installing the Red Hat Service Mesh operator you have to install the Elasticsearch, Jaeger and Kiali operators, in this order.
+
+![Red Hat Service Mesh Operators](images/operators.png "Red Hat Service Mesh Operators")
+
+### Install Elasticsearch Operator
+
+- Update Channel: 4.5
+- Installation Mode: All namespaces
+- Installed Namespace: openshift-operators
+- Approval Strategy: Automatic
+
+### Install Red Hat OpenShift Jaeger Operator
+
+- Update Channel: stable
+- Installation Mode: All namespaces
+- Installed Namespace: openshift-operators
+- Approval Strategy: Automatic
+
+### Install Kiali Operator (provided by Red Hat)
+
+- Update Channel: stable
+- Installation Mode: All namespaces
+- Installed Namespace: openshift-operators
+- Approval Strategy: Automatic
+
+### Install Red Hat OpenShift Service Mesh operator
+
+- Update Channel: stable
+- Installation Mode: All namespaces
+- Installed Namespace: openshift-operators
+- Approval Strategy: Automatic
+
+### Create istio-system project
+
+With all four required operators installed in your cluster you are ready to deploy Istio.
+
+First create a namespace for the control plane, the name `istio-system` is recommended:
+
+`$ oc new-project istio-system`
+
+### Deploy Service Mesh control plane
+
+Once the project is ready you can create the control plane.
+
+A Service Mesh Control Plane manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
+
+`$ kubectl apply -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
+
+Istio operator will then create all the deployments that conform the control plane. After a few minutes it should look like this:
+
+```bash
+$ kubectl get deployments -n istio-system
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+grafana                  1/1     1            1           41d
+ior                      1/1     1            1           41d
+istio-citadel            1/1     1            1           41d
+istio-egressgateway      1/1     1            1           41d
+istio-galley             1/1     1            1           41d
+istio-ingressgateway     1/1     1            1           41d
+istio-pilot              1/1     1            1           41d
+istio-policy             1/1     1            1           41d
+istio-sidecar-injector   1/1     1            1           41d
+istio-telemetry          1/1     1            1           41d
+jaeger                   1/1     1            1           41d
+kiali                    1/1     1            1           15d
+prometheus               1/1     1            1           41d
+```
+
+## 5 - Helm Charts
 
 ![Helm Release](images/helm.png "Helm Release")
 
@@ -158,9 +231,257 @@ $ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
 "grpc-demo" has been added to your repositories
 ```
 
-## 5 - Creating an OpenShift Template for deploying services
+### Deploy the demo using a Helm Chart (with Istio)
 
-> This section explains how to create an OpenShift Template. If you want to use the templates provided in the demo go straight to [Deploy the services with an OpenShift Template using Istio](#deploy-the-services-using-an-openshift-template) or [Deploy the services with an OpenShift Template without using Istio](#deploy-the-services-using-an-openshift-template-without-istio) sections.
+Create a project to deploy the demo services if you haven't done so:
+
+`$ oc new-project grpc-demo-istio`
+
+Create the service mesh [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm) if you haven't done so. This will tell Istio to start monitoring the namespaces specified.
+
+A Service Mesh Member Roll manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio` namespace. If you are using a different name for the project you should change it accordingly.
+
+Use it to create the Member Roll:
+
+`$ kubectl apply -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
+
+We are going to use the [provided Helm Chart](helm-charts/grpc-demo-services-istio/Chart.yaml) for deploying the services using Istio.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo-istio`
+
+Add the chart repository to your helm client and name it `grpc-demo`:
+
+```bash
+
+$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
+"grpc-demo" has been added to your repositories
+
+$ helm repo list
+NAME        URL
+grpc-demo   https://drhelius.github.io/grpc-demo/
+```
+
+Make sure you get the latest list of charts:
+
+```bash
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "grpc-demo" chart repository
+Update Complete. ⎈ Happy Helming!⎈
+```
+
+The chart you are going to install is called `grpc-demo-services-istio`. You can inspect the chart before installing it in your cluster:
+
+```bash
+$ helm show chart grpc-demo/grpc-demo-services-istio
+apiVersion: v2
+description: A group of interconnected GRPC demo services written in Go that run on
+  OpenShift Service Mesh.
+home: https://github.com/drhelius/grpc-demo
+icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
+keywords:
+- go
+- grpc
+- demo
+- service
+- istio
+maintainers:
+- email: isanchez@redhat.com
+  name: Ignacio Sánchez
+  url: https://twitter.com/drhelius
+name: grpc-demo-services-istio
+sources:
+- https://github.com/drhelius/grpc-demo
+version: 1.0.0
+```
+
+The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services-istio/values.yaml) for all the parameters:
+
+```yaml
+appName: grpc-demo-istio
+
+account:
+  image: quay.io/isanchez/grpc-demo-account
+  version: v1.0.0
+  replicas: 1
+  route: account-grpc-demo.mycluster.com
+
+order:
+  image: quay.io/isanchez/grpc-demo-order
+  version: v1.0.0
+  replicas: 1
+
+product:
+  image: quay.io/isanchez/grpc-demo-product
+  version: v1.0.0
+  replicas: 1
+
+user:
+  image: quay.io/isanchez/grpc-demo-user
+  version: v1.0.0
+  replicas: 1
+
+limits:
+  memory: "200"
+  cpu: "0.5"
+
+requests:
+  memory: "100"
+  cpu: "0.1"
+```
+
+Note that you must provide a valid *fqdn* for the route that is going to expose the *Account* service HTTP listener using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
+
+Install the chart using a custom *Account* route:
+
+`$ helm install --set account.route=account-grpc-demo.mycluster.com grpc-demo-istio grpc-demo/grpc-demo-services-istio`
+
+After a few minutes the services should be up an running:
+
+```bash
+$ kubectl get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ helm uninstall grpc-demo-istio`
+
+### Deploy the demo using a Helm Chart (without Istio)
+
+Create a project to deploy the demo services if you haven't done so:
+
+`$ oc new-project grpc-demo`
+
+We are going to use the [provided Helm Chart](helm-charts/grpc-demo-services/Chart.yaml) for deploying the services without using Istio.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo`
+
+Add the chart repository to your helm client and name it `grpc-demo`:
+
+```bash
+
+$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
+"grpc-demo" has been added to your repositories
+
+$ helm repo list
+NAME        URL
+grpc-demo   https://drhelius.github.io/grpc-demo/
+```
+
+Make sure you get the latest list of charts:
+
+```bash
+$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "grpc-demo" chart repository
+Update Complete. ⎈ Happy Helming!⎈
+```
+
+The chart you are going to install is called `grpc-demo-services`. You can inspect the chart before installing it in your cluster:
+
+```bash
+$ helm show chart grpc-demo/grpc-demo-services
+apiVersion: v2
+description: A group of interconnected GRPC demo services written in Go.
+home: https://github.com/drhelius/grpc-demo
+icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
+keywords:
+- go
+- grpc
+- demo
+- service
+maintainers:
+- email: isanchez@redhat.com
+  name: Ignacio Sánchez
+  url: https://twitter.com/drhelius
+name: grpc-demo-services
+sources:
+- https://github.com/drhelius/grpc-demo
+version: 1.0.0
+```
+
+The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services/values.yaml) for all the parameters:
+
+```yaml
+appName: grpc-demo
+
+account:
+  image: quay.io/isanchez/grpc-demo-account
+  version: v1.0.0
+  replicas: 1
+
+order:
+  image: quay.io/isanchez/grpc-demo-order
+  version: v1.0.0
+  replicas: 1
+
+product:
+  image: quay.io/isanchez/grpc-demo-product
+  version: v1.0.0
+  replicas: 1
+
+user:
+  image: quay.io/isanchez/grpc-demo-user
+  version: v1.0.0
+  replicas: 1
+
+limits:
+  memory: "200"
+  cpu: "0.5"
+
+requests:
+  memory: "100"
+  cpu: "0.1"
+```
+
+Install the chart:
+
+`$ helm install grpc-demo grpc-demo/grpc-demo-services`
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+An HTTP route for every service is automatically created:
+
+```bash
+$ oc get route
+NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
+account   account-grpc-demo.apps.mycluster.com                 account    http                 None
+order     order-grpc-demo.apps.mycluster.com                   order      http                 None
+product   product-grpc-demo.apps.mycluster.com                 product    http                 None
+user      user-grpc-demo.apps.mycluster.com                    user       http                 None
+```
+
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ helm uninstall grpc-demo`
+
+## 6 - OpenShift Templates
     
 OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
 
@@ -183,11 +504,164 @@ The `APP_NAME` parameter is just an identifier to label all the manifests create
 
 The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
-## 6 - Creating a Kubernetes Operator for deploying services
+### Deploy the demo using an OpenShift Template (with Istio)
+
+Create a project to deploy the demo services if you haven't done so:
+
+`$ oc new-project grpc-demo-istio`
+
+Create the service mesh [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm) if you haven't done so. This will tell Istio to start monitoring the namespaces specified.
+
+A Service Mesh Member Roll manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio` namespace. If you are using a different name for the project you should change it accordingly.
+
+Use it to create the Member Roll:
+
+`$ oc apply -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
+
+We are going to use the [provided OpenShift template](openshift-templates/grpc-demo-template-istio.yaml) for deploying the services using Istio.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo-istio`
+
+Add the template to your project:
+
+```bash
+$ oc apply -f openshift-templates/grpc-demo-template-istio.yaml
+template.template.openshift.io/grpc-demo-istio created
+
+$ oc get template
+NAME              DESCRIPTION                                                                        PARAMETERS     OBJECTS
+grpc-demo-istio   A group of interconnected GRPC demo services written in Go that run on OpenSh...   18 (all set)   22
+```
+
+This template expects a parameter named `ACCOUNT_ROUTE` to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
+
+You can now use the Web Console to create all the services using this template:
+
+You can also use the cli:
+
+```bash
+$ oc process -f openshift-templates/grpc-demo-template-istio.yaml -p ACCOUNT_ROUTE=account-grpc-demo.mycluster.com | oc apply -f -
+deployment.apps/account-v1.0.0 created
+service/account created
+virtualservice.networking.istio.io/account created
+destinationrule.networking.istio.io/account created
+gateway.networking.istio.io/account created
+virtualservice.networking.istio.io/account-gateway created
+deployment.apps/order-v1.0.0 created
+service/order created
+virtualservice.networking.istio.io/order created
+destinationrule.networking.istio.io/order created
+deployment.apps/product-v1.0.0 created
+service/product created
+virtualservice.networking.istio.io/product created
+destinationrule.networking.istio.io/product created
+deployment.apps/user-v1.0.0 created
+service/user created
+virtualservice.networking.istio.io/user created
+destinationrule.networking.istio.io/user created
+serviceentry.networking.istio.io/httpbin created
+gateway.networking.istio.io/httpbin created
+destinationrule.networking.istio.io/httpbin created
+virtualservice.networking.istio.io/httpbin created
+```
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           3m1s
+order-v1.0.0     1/1     1            1           3m1s
+product-v1.0.0   1/1     1            1           3m1s
+user-v1.0.0      1/1     1            1           3m1s
+```
+
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
+
+### Deploy the demo using an OpenShift Template (without Istio)
+
+Create a project to deploy the demo services if you haven't done so:
+
+`$ oc new-project grpc-demo`
+
+We are going to use the [provided OpenShift Template](openshift-templates/grpc-demo-template.yaml) for deploying the services without using Istio.
+
+Make sure you are working with the right namespace:
+
+`$ oc project grpc-demo`
+
+Add the template to your project:
+
+```bash
+$ oc apply -f openshift-templates/grpc-demo-template.yaml
+template.template.openshift.io/grpc-demo created
+
+$ oc get template
+NAME        DESCRIPTION                                                   PARAMETERS     OBJECTS
+grpc-demo   A group of interconnected GRPC demo services written in Go.   17 (all set)   12
+```
+
+You can now use the Web Console to create all the services using this template:
+
+You can also use the cli:
+
+```bash
+$ oc process -f openshift-templates/grpc-demo-template.yaml | oc apply -f -
+deployment.apps/account-v1.0.0 created
+service/account created
+route.route.openshift.io/account created
+deployment.apps/order-v1.0.0 created
+service/order created
+route.route.openshift.io/order created
+deployment.apps/product-v1.0.0 created
+service/product created
+route.route.openshift.io/product created
+deployment.apps/user-v1.0.0 created
+service/user created
+route.route.openshift.io/user created
+```
+
+After a few minutes the services should be up an running:
+
+```bash
+$ oc get deployments
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+account-v1.0.0   1/1     1            1           43s
+order-v1.0.0     1/1     1            1           42s
+product-v1.0.0   1/1     1            1           42s
+user-v1.0.0      1/1     1            1           41s
+```
+
+An HTTP route for every service is automatically created:
+
+```bash
+$ oc get route
+NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
+account   account-grpc-demo.apps.mycluster.com                 account    http                 None
+order     order-grpc-demo.apps.mycluster.com                   order      http                 None
+product   product-grpc-demo.apps.mycluster.com                 product    http                 None
+user      user-grpc-demo.apps.mycluster.com                    user       http                 None
+```
+
+You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
+
+`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
+
+You can uninstall everything deployed by running:
+
+`$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
+
+## 7 - Creating a Kubernetes Operator for deploying services
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
-
-> This section explains how to create a Kubernetes Operator. If you want to use the Operator provided in the demo go straight to [Deploy the services using a Kubernetes Operator](#deploy-the-services-using-a-kubernetes-operator).
 
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
@@ -438,491 +912,9 @@ env:
 $ make deploy IMG=quay.io/isanchez/grpc-demo-operator:v0.0.1
 ```
 
-## 7 - Installing Istio Service Mesh in OpenShift
+### Deploy the demo using a Kubernetes Operator (without Istio)
 
-In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
-
-Istio in OpenShift is installed by running a set of operators. Before installing the Red Hat Service Mesh operator you have to install the Elasticsearch, Jaeger and Kiali operators, in this order.
-
-![Red Hat Service Mesh Operators](images/operators.png "Red Hat Service Mesh Operators")
-
-### Install Elasticsearch Operator
-
-- Update Channel: 4.5
-- Installation Mode: All namespaces
-- Installed Namespace: openshift-operators
-- Approval Strategy: Automatic
-
-### Install Red Hat OpenShift Jaeger Operator
-
-- Update Channel: stable
-- Installation Mode: All namespaces
-- Installed Namespace: openshift-operators
-- Approval Strategy: Automatic
-
-### Install Kiali Operator (provided by Red Hat)
-
-- Update Channel: stable
-- Installation Mode: All namespaces
-- Installed Namespace: openshift-operators
-- Approval Strategy: Automatic
-
-### Install Red Hat OpenShift Service Mesh operator
-
-- Update Channel: stable
-- Installation Mode: All namespaces
-- Installed Namespace: openshift-operators
-- Approval Strategy: Automatic
-
-### Create istio-system project
-
-With all four required operators installed in your cluster you are ready to deploy Istio.
-
-First create a namespace for the control plane, the name `istio-system` is recommended:
-
-`$ oc new-project istio-system`
-
-### Deploy Service Mesh control plane
-
-Once the project is ready you can create the control plane.
-
-A Service Mesh Control Plane manifest is [provided in this repo](openshift-service-mesh/service-mesh-control-plane.yaml). Use it to bootstrap the installation of Istio in OpenShift:
-
-`$ kubectl apply -f openshift-service-mesh/service-mesh-control-plane.yaml -n istio-system`
-
-Istio operator will then create all the deployments that conform the control plane. After a few minutes it should look like this:
-
-```bash
-$ kubectl get deployments -n istio-system
-NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
-grafana                  1/1     1            1           41d
-ior                      1/1     1            1           41d
-istio-citadel            1/1     1            1           41d
-istio-egressgateway      1/1     1            1           41d
-istio-galley             1/1     1            1           41d
-istio-ingressgateway     1/1     1            1           41d
-istio-pilot              1/1     1            1           41d
-istio-policy             1/1     1            1           41d
-istio-sidecar-injector   1/1     1            1           41d
-istio-telemetry          1/1     1            1           41d
-jaeger                   1/1     1            1           41d
-kiali                    1/1     1            1           15d
-prometheus               1/1     1            1           41d
-```
-
-## 8 - Deploying the demo services using Istio
-
-Two methods are provided to deploy the demo services and setup the service mesh:
-
-- Helm Chart
-- OpenShift Template
-
-But first you need to create a namespace for the services and tell Istio to start monitoring this namespace by adding it to the [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm).
-
-### Create a project to deploy the demo services
-
-`$ oc new-project grpc-demo-istio`
-
-### Create the service mesh member roll
-
-A Service Mesh Member Roll manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio` project just created. If you are using a different name for the project you should change it accordingly.
-
-Use it to create the Member Roll:
-
-`$ kubectl apply -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
-
-### Deploy the services using a Helm Chart
-
-If you wish to use the [provided Helm Chart](helm-charts/grpc-demo-services-istio/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
-
-Make sure you are working with the right namespace:
-
-`$ oc project grpc-demo-istio`
-
-Add the chart repository to your helm client and name it `grpc-demo`:
-
-```bash
-
-$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
-"grpc-demo" has been added to your repositories
-
-$ helm repo list
-NAME        URL
-grpc-demo   https://drhelius.github.io/grpc-demo/
-```
-
-Make sure you get the latest list of charts:
-
-```bash
-$ helm repo update
-Hang tight while we grab the latest from your chart repositories...
-...Successfully got an update from the "grpc-demo" chart repository
-Update Complete. ⎈ Happy Helming!⎈
-```
-
-The chart you are going to install is called `grpc-demo-services-istio`. You can inspect the chart before installing it in your cluster:
-
-```bash
-$ helm show chart grpc-demo/grpc-demo-services-istio
-apiVersion: v2
-description: A group of interconnected GRPC demo services written in Go that run on
-  OpenShift Service Mesh.
-home: https://github.com/drhelius/grpc-demo
-icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
-keywords:
-- go
-- grpc
-- demo
-- service
-- istio
-maintainers:
-- email: isanchez@redhat.com
-  name: Ignacio Sánchez
-  url: https://twitter.com/drhelius
-name: grpc-demo-services-istio
-sources:
-- https://github.com/drhelius/grpc-demo
-version: 1.0.0
-```
-
-The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services-istio/values.yaml) for all the parameters:
-
-```yaml
-appName: grpc-demo-istio
-
-account:
-  image: quay.io/isanchez/grpc-demo-account
-  version: v1.0.0
-  replicas: 1
-  route: account-grpc-demo.mycluster.com
-
-order:
-  image: quay.io/isanchez/grpc-demo-order
-  version: v1.0.0
-  replicas: 1
-
-product:
-  image: quay.io/isanchez/grpc-demo-product
-  version: v1.0.0
-  replicas: 1
-
-user:
-  image: quay.io/isanchez/grpc-demo-user
-  version: v1.0.0
-  replicas: 1
-
-limits:
-  memory: "200"
-  cpu: "0.5"
-
-requests:
-  memory: "100"
-  cpu: "0.1"
-```
-
-Note that you must provide a valid *fqdn* for the route that is going to expose the *Account* service HTTP listener using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
-
-Install the chart using a custom *Account* route:
-
-`$ helm install --set account.route=account-grpc-demo.mycluster.com grpc-demo-istio grpc-demo/grpc-demo-services-istio`
-
-After a few minutes the services should be up an running:
-
-```bash
-$ kubectl get deployments
-NAME             READY   UP-TO-DATE   AVAILABLE   AGE
-account-v1.0.0   1/1     1            1           3m1s
-order-v1.0.0     1/1     1            1           3m1s
-product-v1.0.0   1/1     1            1           3m1s
-user-v1.0.0      1/1     1            1           3m1s
-```
-
-You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
-
-`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
-
-You can uninstall everything deployed by running:
-
-`$ helm uninstall grpc-demo-istio`
-
-### Deploy the services using an OpenShift template
-
-If you wish to use the [provided OpenShift template](openshift-templates/grpc-demo-template-istio.yaml) to deploy the demo services and all required manifests follow this steps.
-
-Make sure you are working with the right namespace:
-
-`$ oc project grpc-demo-istio`
-
-Add the template to your project:
-
-```bash
-$ oc apply -f openshift-templates/grpc-demo-template-istio.yaml
-template.template.openshift.io/grpc-demo-istio created
-
-$ oc get template
-NAME              DESCRIPTION                                                                        PARAMETERS     OBJECTS
-grpc-demo-istio   A group of interconnected GRPC demo services written in Go that run on OpenSh...   18 (all set)   22
-```
-
-This template expects a parameter named `ACCOUNT_ROUTE` to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
-
-You can now use the Web Console to create all the services using this template:
-
-You can also use the cli:
-
-```bash
-$ oc process -f openshift-templates/grpc-demo-template-istio.yaml -p ACCOUNT_ROUTE=account-grpc-demo.mycluster.com | oc apply -f -
-deployment.apps/account-v1.0.0 created
-service/account created
-virtualservice.networking.istio.io/account created
-destinationrule.networking.istio.io/account created
-gateway.networking.istio.io/account created
-virtualservice.networking.istio.io/account-gateway created
-deployment.apps/order-v1.0.0 created
-service/order created
-virtualservice.networking.istio.io/order created
-destinationrule.networking.istio.io/order created
-deployment.apps/product-v1.0.0 created
-service/product created
-virtualservice.networking.istio.io/product created
-destinationrule.networking.istio.io/product created
-deployment.apps/user-v1.0.0 created
-service/user created
-virtualservice.networking.istio.io/user created
-destinationrule.networking.istio.io/user created
-serviceentry.networking.istio.io/httpbin created
-gateway.networking.istio.io/httpbin created
-destinationrule.networking.istio.io/httpbin created
-virtualservice.networking.istio.io/httpbin created
-```
-
-After a few minutes the services should be up an running:
-
-```bash
-$ oc get deployments
-NAME             READY   UP-TO-DATE   AVAILABLE   AGE
-account-v1.0.0   1/1     1            1           3m1s
-order-v1.0.0     1/1     1            1           3m1s
-product-v1.0.0   1/1     1            1           3m1s
-user-v1.0.0      1/1     1            1           3m1s
-```
-
-You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
-
-`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
-
-You can uninstall everything deployed by running:
-
-`$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
-
-## 9 - Deploying the demo services without using Istio
-
-Three methods are provided to deploy the demo services without using a service mesh:
-
-- Helm Chart
-- OpenShift Template
-- Kubernetes Operator
-
-You can have the demo services deployed both with Istio and without it at the same time but, for simplicity, you may want to deploy them in a different namespace.
-
-### Create a project to deploy the demo services
-
-`$ oc new-project grpc-demo`
-
-### Deploy the services using a Helm Chart without Istio
-
-If you wish to use the [provided Helm Chart](helm-charts/grpc-demo-services/Chart.yaml) to deploy the demo services and all required manifests follow this steps.
-
-Make sure you are working with the right namespace:
-
-`$ oc project grpc-demo`
-
-Add the chart repository to your helm client and name it `grpc-demo`:
-
-```bash
-
-$ helm repo add grpc-demo https://drhelius.github.io/grpc-demo/
-"grpc-demo" has been added to your repositories
-
-$ helm repo list
-NAME        URL
-grpc-demo   https://drhelius.github.io/grpc-demo/
-```
-
-Make sure you get the latest list of charts:
-
-```bash
-$ helm repo update
-Hang tight while we grab the latest from your chart repositories...
-...Successfully got an update from the "grpc-demo" chart repository
-Update Complete. ⎈ Happy Helming!⎈
-```
-
-The chart you are going to install is called `grpc-demo-services`. You can inspect the chart before installing it in your cluster:
-
-```bash
-$ helm show chart grpc-demo/grpc-demo-services
-apiVersion: v2
-description: A group of interconnected GRPC demo services written in Go.
-home: https://github.com/drhelius/grpc-demo
-icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
-keywords:
-- go
-- grpc
-- demo
-- service
-maintainers:
-- email: isanchez@redhat.com
-  name: Ignacio Sánchez
-  url: https://twitter.com/drhelius
-name: grpc-demo-services
-sources:
-- https://github.com/drhelius/grpc-demo
-version: 1.0.0
-```
-
-The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services/values.yaml) for all the parameters:
-
-```yaml
-appName: grpc-demo
-
-account:
-  image: quay.io/isanchez/grpc-demo-account
-  version: v1.0.0
-  replicas: 1
-
-order:
-  image: quay.io/isanchez/grpc-demo-order
-  version: v1.0.0
-  replicas: 1
-
-product:
-  image: quay.io/isanchez/grpc-demo-product
-  version: v1.0.0
-  replicas: 1
-
-user:
-  image: quay.io/isanchez/grpc-demo-user
-  version: v1.0.0
-  replicas: 1
-
-limits:
-  memory: "200"
-  cpu: "0.5"
-
-requests:
-  memory: "100"
-  cpu: "0.1"
-```
-
-Install the chart:
-
-`$ helm install grpc-demo grpc-demo/grpc-demo-services`
-
-After a few minutes the services should be up an running:
-
-```bash
-$ oc get deployments
-NAME             READY   UP-TO-DATE   AVAILABLE   AGE
-account-v1.0.0   1/1     1            1           3m1s
-order-v1.0.0     1/1     1            1           3m1s
-product-v1.0.0   1/1     1            1           3m1s
-user-v1.0.0      1/1     1            1           3m1s
-```
-
-An HTTP route for every service is automatically created:
-
-```bash
-$ oc get route
-NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
-account   account-grpc-demo.apps.mycluster.com                 account    http                 None
-order     order-grpc-demo.apps.mycluster.com                   order      http                 None
-product   product-grpc-demo.apps.mycluster.com                 product    http                 None
-user      user-grpc-demo.apps.mycluster.com                    user       http                 None
-```
-
-You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
-
-`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
-
-You can uninstall everything deployed by running:
-
-`$ helm uninstall grpc-demo`
-
-### Deploy the services using an OpenShift template without Istio
-
-If you wish to use the [provided OpenShift template](openshift-templates/grpc-demo-template.yaml) to deploy the demo services and all required manifests follow this steps.
-
-Make sure you are working with the right namespace:
-
-`$ oc project grpc-demo`
-
-Add the template to your project:
-
-```bash
-$ oc apply -f openshift-templates/grpc-demo-template.yaml
-template.template.openshift.io/grpc-demo created
-
-$ oc get template
-NAME        DESCRIPTION                                                   PARAMETERS     OBJECTS
-grpc-demo   A group of interconnected GRPC demo services written in Go.   17 (all set)   12
-```
-
-You can now use the Web Console to create all the services using this template:
-
-You can also use the cli:
-
-```bash
-$ oc process -f openshift-templates/grpc-demo-template.yaml | oc apply -f -
-deployment.apps/account-v1.0.0 created
-service/account created
-route.route.openshift.io/account created
-deployment.apps/order-v1.0.0 created
-service/order created
-route.route.openshift.io/order created
-deployment.apps/product-v1.0.0 created
-service/product created
-route.route.openshift.io/product created
-deployment.apps/user-v1.0.0 created
-service/user created
-route.route.openshift.io/user created
-```
-
-After a few minutes the services should be up an running:
-
-```bash
-$ oc get deployments
-NAME             READY   UP-TO-DATE   AVAILABLE   AGE
-account-v1.0.0   1/1     1            1           43s
-order-v1.0.0     1/1     1            1           42s
-product-v1.0.0   1/1     1            1           42s
-user-v1.0.0      1/1     1            1           41s
-```
-
-An HTTP route for every service is automatically created:
-
-```bash
-$ oc get route
-NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
-account   account-grpc-demo.apps.mycluster.com                 account    http                 None
-order     order-grpc-demo.apps.mycluster.com                   order      http                 None
-product   product-grpc-demo.apps.mycluster.com                 product    http                 None
-user      user-grpc-demo.apps.mycluster.com                    user       http                 None
-```
-
-You can test the services using HTTP by sending a GET request to the *Account* service (any account ID will do). For simplicity, the starting request will be HTTP but all subsequent requests between services will be GRPC:
-
-`$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
-
-You can uninstall everything deployed by running:
-
-`$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
-
-### Deploy the services using a Kubernetes Operator without Istio
-
-If you wish to use the [provided Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator) to deploy the demo services and all required manifests follow this steps.
-
-First clone the operator repository:
+First, clone the [provided Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator) repository:
 
 ```bash
 $ git clone https://github.com/drhelius/grpc-demo-operator.git
@@ -1044,7 +1036,7 @@ $ kubectl delete demoservices.grpcdemo.example.com example-services
 demoservices.grpcdemo.example.com "example-services" deleted
 ```
 
-## 10 - Observability with Kiali
+## 8 - Observability with Kiali
 
 ![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
 
