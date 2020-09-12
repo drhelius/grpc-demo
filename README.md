@@ -23,17 +23,17 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 1. [Components](#1---components)
 2. [Architecture](#2---architecture)
 3. [gRPC services in Go](#3---grpc-services-in-go)
-4. [Istio Service Mesh in OpenShift](#7---istio-service-mesh-in-openshift)
-5. [Helm Charts](#4---helm-charts)
+4. [Istio Service Mesh in OpenShift](#4---istio-service-mesh-in-openshift)
+5. [Helm Charts](#5---helm-charts)
     - [Packaging and distributing a Helm Chart](#packaging-and-distributing-a-helm-chart)
-    - [Deploy the demo using a Helm Chart (with Istio)](#deploy-the-demo-using-a-helm-chart-istio)
-    - [Deploy the demo using a Helm Chart (without Istio)](#deploy-the-services-using-a-helm-chart-without-istio)
-6. [OpenShift Templates](#5---openshift-templates)
-    - [Deploy the demo using an OpenShift Template (with Istio)](#deploy-the-services-using-an-openshift-template)
-    - [Deploy the demo using an OpenShift Template (without Istio)](#deploy-the-services-using-an-openshift-template-without-istio)
-7. [Kubernetes Operators](#6---kubernetes-operators)
-    - [Deploy the demo using a Kubernetes Operator (without Istio)](#deploy-the-services-using-a-kubernetes-operator-without-istio)   
-8. [Observability with Kiali](#10---observability-with-kiali)
+    - [Deploy the demo using a Helm Chart (with Istio)](#deploy-the-demo-using-a-helm-chart-with-istio)
+    - [Deploy the demo using a Helm Chart (without Istio)](#deploy-the-demo-using-a-helm-chart-without-istio)
+6. [OpenShift Templates](#6---openshift-templates)
+    - [Deploy the demo using an OpenShift Template (with Istio)](#deploy-the-demo-using-an-openshift-template-with-istio)
+    - [Deploy the demo using an OpenShift Template (without Istio)](#deploy-the-demo-using-an-openshift-template-without-istio)
+7. [Kubernetes Operators](#7---kubernetes-operators)
+    - [Deploy the demo using a Kubernetes Operator (without Istio)](#deploy-the-demo-using-a-kubernetes-operator-without-istio)   
+8. [Observability with Kiali](#8---observability-with-kiali)
 
 ## 1 - Components
 
@@ -659,7 +659,7 @@ You can uninstall everything deployed by running:
 
 `$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
 
-## 7 - Creating a Kubernetes Operator for deploying services
+## 7 - Kubernetes Operators
 
 ![Deploying with operator](images/architecture_operator.png "Deploying with operator")
 
