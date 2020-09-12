@@ -32,6 +32,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
     - [Deploy the demo using an OpenShift Template (with Istio)](#deploy-the-demo-using-an-openshift-template-with-istio)
     - [Deploy the demo using an OpenShift Template (without Istio)](#deploy-the-demo-using-an-openshift-template-without-istio)
 7. [Kubernetes Operators](#7---kubernetes-operators)
+    - [Demo Operator](#demo-operator)
     - [Deploy the demo using a Kubernetes Operator (without Istio)](#deploy-the-demo-using-a-kubernetes-operator-without-istio)   
 8. [Observability with Kiali](#8---observability-with-kiali)
 
@@ -665,7 +666,7 @@ The operator in this demo can only deploy the services without using Istio. Crea
 
 A nice way to create an Operator is by using the [Operator SDK](https://sdk.operatorframework.io/). It provides the tools to build, test and package Operators. In addition, it will create the scafolding needed to start writing your operator easily. Check out the [docs](https://sdk.operatorframework.io/docs/) and don't miss the awesome free eBook about [Kubernetes Operators](https://developers.redhat.com/books/kubernetes-operators).
 
-There are three ways to create an Operator using the Operator SDK: Helm, Ansible and Go. The operator in this demo is written in Go. Given the three options, Go is the most powerful but also the most complex of the three.
+There are three ways to create an Operator using the Operator SDK: Helm, Ansible and Go. The operator in this demo is written in Go. Given the three options, Go is the most powerful but also the most complex out of the three.
 
 Recommended reads before proceeding:
 
@@ -673,12 +674,15 @@ Recommended reads before proceeding:
 - ['Hello, World' tutorial with Kubernetes Operators](https://developers.redhat.com/blog/2020/08/21/hello-world-tutorial-with-kubernetes-operators/)
 - [With Kubernetes Operators comes great responsibility](https://www.redhat.com/en/blog/kubernetes-operators-comes-great-responsibility)
 - [Kubernetes Operators Best Practices](https://www.openshift.com/blog/kubernetes-operators-best-practices)
+- [5 tips for developing Kubernetes Operators with the new Operator SDK](https://developers.redhat.com/blog/2020/09/11/5-tips-for-developing-kubernetes-operators-with-the-new-operator-sdk/)
+
+### Demo Operator
 
 These are the steps followed to create the Operator provided in this demo:
 
 - Install the Operator SDK following the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
 
-- Create a new project. Note that we use `example.com` to group our CRDs:
+- Create a new project. Note that we use `example.com` to group our CRDs, you may use whatever you wish:
 
 ```bash
 $ mkdir -p $HOME/projects/grpc-demo-operator
@@ -686,7 +690,7 @@ $ cd $HOME/projects/grpc-demo-operator
 $ operator-sdk init --domain=example.com --repo=github.com/drhelius/grpc-demo-operator
 ```
 
-- Create a new Custom Resource Definition (CRD) with version `v1` and Kind `DemoServices`:
+- Create a new Custom Resource Definition (CRD) with version `v1` and Kind `DemoServices`. This kind is the name of our new custom CRD, so you can choose a different name if you wish:
 
 ```bash
 $ operator-sdk create api --group grpcdemo --version v1 --kind DemoServices --resource=true --controller=true
@@ -812,7 +816,6 @@ err = c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, h, predDeployment)
 if err != nil {
 	return err
 }
-  
 ```
 
 - You can then add the logic of the controller. The controller in this operator will trigger a *reconcile* when the primary watched resource changes. Then, it will keep the state  defined in it. Additionally, it will trigger when any of the secondary watched resources change, like `Deployments`, `Routes`, and `Services` to also check if they are in the desired state. Finally, it will delete any orphaned resource not owned by any microservice that may be removed from the `DemoService` CR:
