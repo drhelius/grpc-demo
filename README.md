@@ -678,7 +678,7 @@ Recommended reads before proceeding:
 
 ### Demo Operator
 
-These are the steps followed to create the Operator provided in this demo:
+> These are the steps followed to create the Operator provided in this demo. They are useful if you want to create an Operator from scratch. If you just want to deploy the demo using the Operator provided you can jump straight to [Deploy the demo using a Kubernetes Operator (without Istio)](#deploy-the-demo-using-a-kubernetes-operator-without-istio).
 
 - Install the Operator SDK following the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
 
