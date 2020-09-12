@@ -155,8 +155,6 @@ prometheus               1/1     1            1           41d
 
 ![Helm Release](images/helm.png "Helm Release")
 
-> This section explains how to create a Helm Chart. If you want to use the Charts provided in the demo go straight to [Deploy the services with a Helm Chart using Istio](#deploy-the-services-using-a-helm-chart) or [Deploy the services with a Helm Chart without using Istio](#deploy-the-services-using-a-helm-chart-without-istio) sections.
-
 Helm Charts are an easy and powerful tool to deploy your services.
 
 In this demo there are two different charts provided for deploying the services both with Istio and without it:
