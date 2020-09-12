@@ -207,9 +207,9 @@ In this demo a Helm repo is provided by using [GitHub Pages](https://pages.githu
 
 This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
 
-If you visit this URL with your browser you will face a 404 as there aren't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml`: <https://drhelius.github.io/grpc-demo/index.yaml>
+If you visit this URL with your browser you will face a 404 as there isn't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml`: <https://drhelius.github.io/grpc-demo/index.yaml>
 
-In order to create the chart tgz file you can use the following commands:
+In order to create the compressed chart file you can use the following commands:
 
 ```bash
 $ helm package helm-charts/grpc-demo-services
@@ -218,7 +218,7 @@ $ helm package helm-charts/grpc-demo-services-istio
 
 This will output a tgz file containing your chart. Put these tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file too.
 
-To create your Helm repo index run this command providing the directory path where the tgz files are located and using the URL where you are expecting to serve the Helm repository. It will read the directory and generate an index file based on the charts found:
+To create your index run the following command specifying the directory where the tgz files are located and the URL where you are expecting to publish the Helm repo. It will read the directory and generate an index file based on the charts found:
 
 `$ helm repo index docs --url https://drhelius.github.io/grpc-demo/`
 
@@ -330,9 +330,7 @@ requests:
   cpu: "0.1"
 ```
 
-Note that you must provide a valid *fqdn* for the route that is going to expose the *Account* service HTTP listener using an Ingress Gateway. This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` for a route valid in your cluster.
-
-Install the chart using a custom *Account* route:
+Install the chart using a custom *Account* route. Note that you must provide a valid *fqdn* for the route that is going to expose the *Account* service HTTP listener using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). This *fqdn* should make sense in your cluster so change `account-grpc-demo.mycluster.com` with a name valid in your cluster:
 
 `$ helm install --set account.route=account-grpc-demo.mycluster.com grpc-demo-istio grpc-demo/grpc-demo-services-istio`
 
