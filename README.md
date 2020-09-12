@@ -349,7 +349,7 @@ You can test the services using HTTP by sending a GET request to the *Account* s
 
 `$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
 
-You can uninstall everything deployed by running:
+You can uninstall everything by running:
 
 `$ helm uninstall grpc-demo-istio`
 
@@ -458,7 +458,7 @@ product-v1.0.0   1/1     1            1           3m1s
 user-v1.0.0      1/1     1            1           3m1s
 ```
 
-An HTTP route for every service is automatically created:
+An HTTP route for every service is automatically generated:
 
 ```bash
 $ oc get route
@@ -473,15 +473,15 @@ You can test the services using HTTP by sending a GET request to the *Account* s
 
 `$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
 
-You can uninstall everything deployed by running:
+You can uninstall everything by running:
 
 `$ helm uninstall grpc-demo`
 
 ## 6 - OpenShift Templates
     
-OpenShift templates are not available in other Kubernetes distributions but they are very convenient for simple deployments if you are working with OpenShift.
+OpenShift Templates are a simple tool to deploy services and apply parameterized changes in your cluster. They are not available in other Kubernetes distributions but they are very convenient for simple scenarios if you are using OpenShift.
 
-These templates can be parameterized but the lack of dynamism (loops and conditionals) usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
+Unfortunately, these templates lack the dynamism (loops and conditionals) often used to achieve complex deployments. This usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
 
 ![Demo Templates](images/templates.png "Demo Templates")
 
@@ -494,9 +494,9 @@ These templates deploy all four services at once. This is convenient for this de
 
 The templates define all the manifests needed in order to get the services deployed and running.
 
-The parameters allow you to configure the services image, version, replicas and resources.
+Parameters allow you to configure each service image, version, replicas and resources.
 
-The `APP_NAME` parameter is just an identifier to label all the manifests created by the templates and organize the view in the OpenShift Developer Console.
+The `APP_NAME` parameter is just an identifier to label all the manifests created by the templates and organize the view in the [OpenShift Developer Console](https://developers.redhat.com/blog/2019/10/16/openshift-developer-perspective/).
 
 The `grpc-demo-template-istio.yaml` template expects an additional `ACCOUNT_ROUTE` parameter to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
@@ -533,9 +533,7 @@ grpc-demo-istio   A group of interconnected GRPC demo services written in Go tha
 
 This template expects a parameter named `ACCOUNT_ROUTE` to expose the *Account* service using an [Ingress Gateway](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/). Make sure to provide a valid *fqdn* for this route that makes sense in your cluster. The default value `account-grpc-demo.mycluster.com` is just a placeholder and will not work out of the box.
 
-You can now use the Web Console to create all the services using this template:
-
-You can also use the cli:
+Now, you can use the Developer Console in OpenShift to deploy all the services using this template. You can also use the cli:
 
 ```bash
 $ oc process -f openshift-templates/grpc-demo-template-istio.yaml -p ACCOUNT_ROUTE=account-grpc-demo.mycluster.com | oc apply -f -
@@ -578,7 +576,7 @@ You can test the services using HTTP by sending a GET request to the *Account* s
 
 `$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
 
-You can uninstall everything deployed by running:
+You can uninstall everything by running:
 
 `$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
 
@@ -605,9 +603,7 @@ NAME        DESCRIPTION                                                   PARAME
 grpc-demo   A group of interconnected GRPC demo services written in Go.   17 (all set)   12
 ```
 
-You can now use the Web Console to create all the services using this template:
-
-You can also use the cli:
+Now, you can use the Developer Console in OpenShift to deploy all the services using this template. You can also use the cli:
 
 ```bash
 $ oc process -f openshift-templates/grpc-demo-template.yaml | oc apply -f -
@@ -651,7 +647,7 @@ You can test the services using HTTP by sending a GET request to the *Account* s
 
 `$ curl http://account-grpc-demo.apps.mycluster.com/v1/account/01234`
 
-You can uninstall everything deployed by running:
+You can uninstall everything by running:
 
 `$ oc process -f openshift-templates/grpc-demo-template-istio.yaml | oc delete -f -`
 
