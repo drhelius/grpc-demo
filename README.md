@@ -62,7 +62,9 @@ This demo is composed of four microservices modeling how a customer buy products
 - [User](https://github.com/drhelius/grpc-demo-user): The user personal information.
 - [Product](https://github.com/drhelius/grpc-demo-product): A description of a product in the store including price an details.
 
-All four microservices are written in Go using gRPC as the main communication framework. Additionally, an HTTP (REST) listener is also provided for each of them.
+All four microservices are written in Go using gRPC as the main communication framework. Additionally, an HTTP (REST) listener is also provided for each of them. 
+
+In addition to this four services, the *Order* service uses [`httpbin.org`](https://httpbin.org) for simulating service calls to external resources.
 
 The demo can be setup using Istio or without using it.
 
