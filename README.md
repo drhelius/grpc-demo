@@ -396,7 +396,7 @@ You can invoke the *Account* service with the following command, given that `acc
 
 `$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
 
-For your reference, a response from the `Read` method in the *Account* looks similar to this (in JSON):
+For your reference, the response from the `Read` method of the *Account* service looks similar to this (in JSON):
 
 ```json
 {
