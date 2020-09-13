@@ -25,7 +25,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 3. [gRPC services in Go](#3---grpc-services-in-go)
 4. [Istio Service Mesh in OpenShift](#4---istio-service-mesh-in-openshift)
 5. [Helm Charts](#5---helm-charts)
-    - [Packaging and distributing a Helm Chart](#packaging-and-distributing-a-helm-chart)
+    - [Package and distribute a Helm Chart](#package-and-distribute-a-helm-chart)
     - [Deploy the demo using a Helm Chart (with Istio)](#deploy-the-demo-using-a-helm-chart-with-istio)
     - [Deploy the demo using a Helm Chart (without Istio)](#deploy-the-demo-using-a-helm-chart-without-istio)
 6. [OpenShift Templates](#6---openshift-templates)
@@ -156,9 +156,9 @@ prometheus               1/1     1            1           41d
 
 ![Helm Release](images/helm.png "Helm Release")
 
-Helm Charts are an easy and powerful tool to deploy your services.
+Helm Charts are an easy and powerful tool for deploying your services.
 
-In this demo there are two different charts provided for deploying the services both with Istio and without it:
+In this demo there are two different charts for deploying the services both with Istio and without it:
 
 - [grpc-demo-services-istio](helm-charts/grpc-demo-services-istio/Chart.yaml)
 - [grpc-demo-services](helm-charts/grpc-demo-services/Chart.yaml)
@@ -169,7 +169,7 @@ A chart is a Helm package where you define [templates](helm-charts/grpc-demo-ser
 
 These templates can contain references to variables, functions, loops and conditionals that will be rendered when the chart is installed.
 
-This is an example of a template for defining an Istio Gateway for the *Account* service. Note that variables are being used to set up some values. The value of this variables will be provided when the chart is installed:
+This example shows a `Gateway` template for the *Account* service. This `Gateway` is part of the Istio configuration in order to expose the service outside the mesh. Note that variables are being used to set up some values. The value of this variables will be provided when the chart is installed:
 
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -198,7 +198,7 @@ You can also provide [default values](helm-charts/grpc-demo-services-istio/value
 
 Refer to the [official docs](https://helm.sh/docs/topics/charts/) for more information on how to develop a Helm Chart.
 
-### Packaging and distributing a Helm Chart
+### Package and distribute a Helm Chart
 
 Once you have developed a Helm Chart you can make a package and create a Helm repository to distribute it.
 
