@@ -146,13 +146,13 @@ message ReadUserResp {
 
 In this proto file a service called `UserService` is described. The service has two *methods*, `Create` and `Read`. Each *method* use *messages* to transfer data. 
 
-The `Read` *methodo* uses the `ReadUserReq` message as input and `ReadUserResp` as output. `ReadUserReq` is defined as a simple data structure with a single string that represents the User *id*. `ReadUserResp` is defined with a field called *user* of type `User`.
+The `Read` *method* uses the `ReadUserReq` message as input and `ReadUserResp` as output. `ReadUserReq` is defined as a simple data structure with a single string that represents the User *id*. `ReadUserResp` is defined with a field called *user* of type `User`.
 
 The type or *message* `User` is defined as a group of three strings, *id*, *name* and *email*.
 
 So the Read *method* expects a user ID and returns the user data.
 
-Note that this proto file is *importing* `google/api/annotations.proto` to annotate each *method* in the service with `option (google.api.http)`. This annotation let you [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) and viceversa, so that clients can access your gRPC API by using HTTP/JSON:
+Note that this proto file is *importing* `google/api/annotations.proto` to annotate each *method* in the service with `option (google.api.http)`. This annotation let you [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) and vice versa, so that clients can access your gRPC API by using HTTP/JSON:
 
 ```proto
 ...
@@ -169,7 +169,7 @@ Note that this proto file is *importing* `google/api/annotations.proto` to annot
 ...
 ```
 
-So, to create a new User using HTTP you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` from `/v1/user/{id}`.
+So, to create a new User using HTTP you will `POST` the JSON data to `/v1/user`. For retrieving User data you will `GET` from `/v1/user/{id}`.
 
 This is done by using a [gRPC Gateway](https://github.com/grpc-ecosystem/grpc-gateway). This gateway will pass all the messages to the gRPC server and transcode all inputs and outputs to HTTP/JSON.
 
@@ -258,7 +258,7 @@ done
 
 Because we are using the additional `google.api.http` API to transcode HTTP we need to tell `protoc` where to look for the [gRPC Gateway implementation](https://github.com/grpc-ecosystem/grpc-gateway).
 
-The generated code is also commited to this repo so we can use it later as a Go dependency in the service implementation. Thre are two generated files, `${proto}.go` for normal client/server gRPC code and `${proto}.gw.go` for the HTTP gateway.
+The generated code is also committed to this repo so we can use it later as a Go dependency in the service implementation. There are two generated files, `${proto}.go` for normal client/server gRPC code and `${proto}.gw.go` for the HTTP gateway.
 
 In order to use the `protoc` tool you need to install it runnning this commands before. Refer to the [official documentation](https://grpc.io/docs/languages/go/quickstart/) for more information:
 
