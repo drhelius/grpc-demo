@@ -82,19 +82,19 @@ All three deployment methods will create the necessary Kubernetes resources to r
 
 gRPC is a framework to connect services by using *Remote Procedure Calls*, this means that a client application can directly call a method on a server application on a different machine as if it were a local object.
 
-It works across languages and platforms and it is increasingly being used in high performance environments. The protocol can achieve bi-directional streaming with HTTP2 based transport.
+It works across languages and platforms and it is increasingly being used in high performance environments. Its protocol can achieve bi-directional streaming with HTTP2 based transport.
 
 gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview) or *protobuf files* to define the structure for the data you want to transfer.
 
-There are four services in this demo. All of them use gRPC to comunicate wit each other. They are all written in go.
+There are four services in this demo. All of them use gRPC to communicate wit each other. They are all written in Go.
 
-Before diving into the services let examine the *protobuf* files that define all the messages and types used in this demo. There is a shared repo where all proto files are defined:
+Before diving into the services let examine the *protobuf* files that define all the messages and types used in this demo. There is a shared Git repository where all proto files are defined:
 
 - [grpc-demo-proto](https://github.com/drhelius/grpc-demo-proto)
 
-This git repo stores the proto files for all the services in the demo. Some services (*Account* and *Order*) in this demo work like composites. This mean they will aggregate information from other services (*User* and *Product*). In order to do that they share some common types. Sharing a repo with all the protos allows you to easily share types between different proto files.
+This Git repo stores the proto files for all the services in the demo. Some services (*Account* and *Order*) in this demo work like composites. This mean they will aggregate information from other services (*User* and *Product*). In order to do that they share some common types. Sharing a repo with all the proto files let you share types between different proto files easily.
 
-Sharing a repo for protos or creating a repo for each service is a difficult and hairy discussion. This demo will stick with only one repo for simplicity.
+Sharing a Git repo for protos or creating a repo for each service is a difficult and hairy discussion. This demo will stick with only one repo for simplicity.
 
 There is a folder for each service in the repo. In each folder there is a proto file describing the data types that will be used in the service. This is the *User* proto file:
 
@@ -298,9 +298,9 @@ Once you have developed a Helm Chart you can make a package and create a Helm re
 
 Helm repositories are simple web servers that host tgz files. Each chart is distributed as a compressed tgz file. In addition to the charts you need an `index.yaml`. This index will contain the information of the charts in the Helm repo.
 
-In this demo, the Helm repo is provided by using [GitHub Pages](https://pages.github.com/). GitHub let you use a directory in your git repository to store web content. You can use this directory to store some charts and the `index.yaml` file.
+In this demo, the Helm repo is provided by using [GitHub Pages](https://pages.github.com/). GitHub let you use a directory in your Git repository to store web content. You can use this directory to store some charts and the `index.yaml` file.
 
-This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
+This is the URL for the GitHub pages in this Git repo: <https://drhelius.github.io/grpc-demo/>
 
 If you visit this URL with your browser you will face a 404 as there isn't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml` file: <https://drhelius.github.io/grpc-demo/index.yaml>
 
