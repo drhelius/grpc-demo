@@ -96,7 +96,7 @@ This git repo stores the proto files for all the services in the demo. Some serv
 
 Sharing a repo for protos or creating a repo for each service is a difficult and hairy discussion. This demo will stick with only one repo for simplicity.
 
-There is a folder for each service in the repo. In each folder there is a proto file describing the data types that will be used in the service. For exampl, this is the *User* proto file:
+There is a folder for each service in the repo. In each folder there is a proto file describing the data types that will be used in the service. This is the *User* proto file:
 
 ```proto
 syntax = "proto3";
@@ -143,10 +143,36 @@ message ReadUserResp {
 }
 ```
 
+In this proto file a service called `UserService` is described. The service has two operations, `Create` and `Read`. Each operation use *messages* to transfer data. 
 
-Using gRPC wit Go is quite easy.
+The `Read` operation uses the `ReadUserReq` message as input and `ReadUserResp` as output. `ReadUserReq` is defined as a simple data structure with a single string that represents the User *id*. `ReadUserResp` is defined with a field called *user* of type `User`.
 
-https://grpc.io/docs/languages/go/quickstart/
+The type or *message* `User` is defined as group of three strings, *id*, *name* and *email*.
+
+So the Read operation expects a User ID and returns the User data.
+
+Note that this proto file is *importing* `google/api/annotations.proto`. This make it possible to annotate each operation in the service with the `option` keyword to transcode HTTP to gRPC an viceversa, so that clients can access your gRPC API by using HTTP/JSON:
+
+```proto
+...
+        option (google.api.http) = {
+            post: "/v1/user"
+            body: "user"
+        };
+
+...
+
+        option (google.api.http) = {
+            get: "/v1/user/{id}"
+        };
+```
+
+So, to create a User you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` to `/v1/user/{id}`.
+
+
+
+https://github.com/grpc-ecosystem/grpc-gateway
+
 
 ## 4 - Istio Service Mesh in OpenShift
 
