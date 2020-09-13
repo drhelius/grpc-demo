@@ -8,7 +8,7 @@ These technologies include [Go](https://golang.org/), [gRPC](https://grpc.io/), 
 
 Note that this is just a demo and may not represent the real life. Technologies are mixed but they may not be used all at once. Hopefully, it could help you to understand basic concepts that may be the building blocks to create more complex gRPC microservices in a service mesh.
 
-For deployment, three different mechanisms are provided. You can also choose wether you use Istio or not.
+For deployment, three different mechanisms are provided. You can also choose whether you use Istio or not.
 
 All the examples are provided for Red Hat OpenShift but could be applied to any Kubernetes distribution. If you want to run OpenShift on your laptop you may want to try [Red Hat CodeReady Containers](https://developers.redhat.com/products/codeready-containers/overview).
 
