@@ -174,6 +174,8 @@ Note that this proto file is *importing* `google/api/annotations.proto` to annot
 
 So, to create a new User using HTTP you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` from `/v1/user/{id}`.
 
+This is done by using a [gRPC Gateway](https://github.com/grpc-ecosystem/grpc-gateway). This gateway will pass all the messages to the gRPC server and transcode all inputs and outputs to HTTP/JSON.
+
 HTTP transcoding is not required in gRPC but it lets you mix gRPC with RESTful services. In this demo it lets you use simple `curl` commands for testing the services. Note that there is a [`grpcurl`](https://github.com/fullstorydev/grpcurl) tool too.
 
 This is the *Account* proto file:
@@ -225,9 +227,9 @@ message ReadAccountResp {
 }
 ```
 
-It uses more imports: `user/user.proto` and `order/order.proto`. Importing other proto files lets you use the *messages* defined in those files in your current proto file.
+The *Account* proto file uses even more imports: `user/user.proto` and `order/order.proto`. Importing other proto files lets you use the *messages* defined in those files in your current proto file.
 
-The *Account* service aggregates information about the user and the orders made:
+The *Account* service uses the messages from *User* and *Order* services because it aggregates information from both:
 
 ```proto
 message Account {
@@ -241,7 +243,7 @@ The keyword `repeated` indicates that the `orders` field can be repeated any num
 
 Once you have defined your proto files you will use the `protoc` protocol buffer compiler to generate service interface code and stubs in your chosen language.
 
-In the Git proto repository there is a simple script to compile all the proto files:
+In the Git proto repository there is a [`build.sh`](https://github.com/drhelius/grpc-demo-proto/blob/master/build.sh) script to compile all the proto files:
 
 ```shell
 GOOGLE_APIS=${GOPATH}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
@@ -257,11 +259,11 @@ do
 done
 ```
 
-Because we are using the additional `google.api.http` API to transcode HTTP we need to tell `protoc` where to look for it.
+Because we are using the additional `google.api.http` API to transcode HTTP we need to tell `protoc` where to look for the [gRPC Gateway implementation](https://github.com/grpc-ecosystem/grpc-gateway).
 
-The generated code is also commited to this repo so we can use it later as a Go dependency in the service implementation.
+The generated code is also commited to this repo so we can use it later as a Go dependency in the service implementation. Thre are two generated files, `${proto}.go` for normal client/server gRPC code and `${proto}.gw.go` for the HTTP gateway.
 
-In order to use the `protoc` tool you must run this commands. Refer to the [official documentation](https://grpc.io/docs/languages/go/quickstart/) for more information:
+In order to use the `protoc` tool you need to install it runnning this commands before. Refer to the [official documentation](https://grpc.io/docs/languages/go/quickstart/) for more information:
 
 ```shell
 $ export GO111MODULE=on  # Enable module mode
@@ -313,7 +315,7 @@ func Serve(wg *sync.WaitGroup, port string) {
 }
 ```
 
-The HTTP server is a little bit more complex because, in reality, it is a [gRPC Gateway](https://github.com/grpc-ecosystem/grpc-gateway). It needs to know the port where gRPC is serving in order to connect to it, pass it all the messages received and transcode the inputs and outputs:
+The HTTP server is a little bit more complex because, in reality, it is a [gRPC Gateway](https://github.com/grpc-ecosystem/grpc-gateway) as commented before. It needs to know the port where gRPC is serving in order to connect to it, pass it all the messages and transcode all inputs and outputs:
 
 ```go
 func Serve(wg *sync.WaitGroup, grpc_port string, http_port string) {
