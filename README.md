@@ -80,7 +80,73 @@ All three deployment methods will create the necessary Kubernetes resources to r
 
 ## 3 - gRPC services in Go
 
-TODO
+gRPC is a framework to connect services by using *Remote Procedure Calls*, this means that a client application can directly call a method on a server application on a different machine as if it were a local object.
+
+It works across languages and platforms and it is increasingly being used in high performance environments. The protocol can achieve bi-directional streaming with HTTP2 based transport.
+
+gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview) or *protobuf files* to define the structure for the data you want to transfer.
+
+There are four services in this demo. All of them use gRPC to comunicate wit each other. They are all written in go.
+
+Before diving into the services let examine the *protobuf* files that define all the messages and types used in this demo. There is a shared repo where all proto files are defined:
+
+- [grpc-demo-proto](https://github.com/drhelius/grpc-demo-proto)
+
+This git repo stores the proto files for all the services in the demo. Some services (*Account* and *Order*) in this demo work like composites. This mean they will aggregate information from other services (*User* and *Product*). In order to do that they share some common types. Sharing a repo with all the protos allows you to easily share types between different proto files.
+
+Sharing a repo for protos or creating a repo for each service is a difficult and hairy discussion. This demo will stick with only one repo for simplicity.
+
+There is a folder for each service in the repo. In each folder there is a proto file describing the data types that will be used in the service. For exampl, this is the *User* proto file:
+
+```proto
+syntax = "proto3";
+option go_package = "github.com/drhelius/grpc-demo-proto/user";
+
+package user;
+
+import "google/api/annotations.proto";
+
+service UserService {
+    rpc Create (CreateUserReq) returns (CreateUserResp) {
+        option (google.api.http) = {
+            post: "/v1/user"
+            body: "user"
+        };
+    }
+    rpc Read (ReadUserReq) returns (ReadUserResp) {
+        option (google.api.http) = {
+            get: "/v1/user/{id}"
+        };
+    }
+}
+
+message User {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+}
+
+message CreateUserReq {
+    User user = 1;
+}
+
+message CreateUserResp {
+    string id = 1;
+}
+
+message ReadUserReq {
+    string id = 1;
+}
+
+message ReadUserResp {
+    User user = 1;
+}
+```
+
+
+Using gRPC wit Go is quite easy.
+
+https://grpc.io/docs/languages/go/quickstart/
 
 ## 4 - Istio Service Mesh in OpenShift
 
