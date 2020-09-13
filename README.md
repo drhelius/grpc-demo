@@ -202,24 +202,24 @@ Refer to the [official docs](https://helm.sh/docs/topics/charts/) for more infor
 
 Once you have developed a Helm Chart you can make a package and create a Helm repository to distribute it.
 
-Helm repositories are simple web servers that host tgz files. Each chart is distributed as a tgz file package. In addition to the charts you need to create an `index.yaml` to setup your repository. This index will contain the information of all the charts in the Helm repo.
+Helm repositories are simple web servers that host tgz files. Each chart is distributed as a compressed tgz file. In addition to the charts you need an `index.yaml`. This index will contain the information of the charts in the Helm repo.
 
-In this demo a Helm repo is provided by using [GitHub Pages](https://pages.github.com/). With this method, GitHub let you use a directory in your git repository to store web content. We can use this directory to store the charts and the `index.yaml`.
+In this demo, the Helm repo is provided by using [GitHub Pages](https://pages.github.com/). GitHub let you use a directory in your git repository to store web content. We can use this directory to store some charts and the `index.yaml` file.
 
 This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
 
-If you visit this URL with your browser you will face a 404 as there isn't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml`: <https://drhelius.github.io/grpc-demo/index.yaml>
+If you visit this URL with your browser you will face a 404 as there isn't any web content at all. But Helm knows there is a Helm repository there because it can find the `index.yaml` file: <https://drhelius.github.io/grpc-demo/index.yaml>
 
-In order to create the compressed chart file you can use the following commands:
+Use this commands to compress and package the charts into a tgz file:
 
 ```bash
 $ helm package helm-charts/grpc-demo-services
 $ helm package helm-charts/grpc-demo-services-istio
 ```
 
-This will output a tgz file containing your chart. Put these tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file too.
+The output will be a tgz file for each chart. Put these tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file too.
 
-To create your index run the following command specifying the directory where the tgz files are located and the URL where you are expecting to publish the Helm repo. It will read the directory and generate an index file based on the charts found:
+Run the following command to create the index. Specify the directory where the tgz files are located and the URL where you are expecting to publish the Helm repo. It will read the directory and generate an index file based on the charts found:
 
 `$ helm repo index docs --url https://drhelius.github.io/grpc-demo/`
 
