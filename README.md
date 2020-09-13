@@ -151,7 +151,7 @@ The `Read` operation uses the `ReadUserReq` message as input and `ReadUserResp` 
 
 The type or *message* `User` is defined as a group of three strings, *id*, *name* and *email*.
 
-So the Read operation expects a User ID and returns the User data.
+So the Read operation expects a user ID and returns the user data.
 
 Note that this proto file is *importing* `google/api/annotations.proto` to annotate each operation in the service with `option (google.api.http)`. This annotation let you [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) and viceversa, so that clients can access your gRPC API by using HTTP/JSON:
 
@@ -223,7 +223,7 @@ message ReadAccountResp {
 }
 ```
 
-Note that it uses more imports: `user/user.proto` and `order/order.proto`. Importing other proto files let you use the *messages* defined in those files.
+It uses more imports: `user/user.proto` and `order/order.proto`. Importing other proto files lets you use the *messages* defined in those files in your current proto file.
 
 The *Account* service aggregates information about the user and the orders made:
 
@@ -245,11 +245,18 @@ https://github.com/grpc-ecosystem/grpc-gateway
 
 ### Testing the Services
 
+You can test each service individually but it is easier to test the *Account* service directly as this service will end up calling all the others.
+
+If you are using Istio, the *Account* service will be exposed using an `IngressGateway` and an OpenShift `Route`. If not, only an OpenShift `Route` will be created.
+
+You can invoke the *Account* service with the following command, given that `account-grpc-demo.mycluster.com` is the *fqdn* of your exposed `Route`. You can use any number for the account ID:
+
+`$ curl http://account-grpc-demo.mycluster.com/v1/account/01234`
+
 For your reference, a response from the `Read` operation in the *Account* looks like this (in JSON):
 
 ```json
 ```
-
 
 ## 4 - Istio Service Mesh in OpenShift
 
