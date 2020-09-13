@@ -1,11 +1,5 @@
 # Istio gRPC Golang Demo
 
----
-
-STILL IN DEVELOPMENT
-
----
-
 ![Istio gRPC Golang Demo](images/kiali3.png)
 
 This is a demo to showcase the features of some of the technologies that may be involved in modern microservice development and operation within a Kubernetes platform.
@@ -407,6 +401,132 @@ You can invoke the *Account* service with the following command, given that `acc
 For your reference, a response from the `Read` method in the *Account* looks like this (in JSON):
 
 ```json
+{
+    "account": {
+        "id": "01234",
+        "user": {
+            "id": "261782",
+            "name": "Addison Davis",
+            "email": "avathompson150@test.com"
+        },
+        "orders": [
+            {
+                "id": "523773",
+                "name": "Goosebold",
+                "date": "319615",
+                "products": [
+                    {
+                        "id": "322704",
+                        "name": "Watchertwisty",
+                        "description": "She stared at him in astonishment, and as she read something of the significant hieroglyphic of his battered face, her lips whitened.",
+                        "price": 164
+                    },
+                    {
+                        "id": "897965",
+                        "name": "Slicerdot",
+                        "description": "I protest, even warmly, that neither he nor his sorrows were in my intention.",
+                        "price": 399
+                    },
+                    {
+                        "id": "575966",
+                        "name": "Ladybitter",
+                        "description": "The sun set; the dusk fell on the stream, and lights began to appear along the shore. The Chapman light–house, a three–legged thing erect on a mud–flat, shone strongly.",
+                        "price": 226
+                    },
+                    {
+                        "id": "889320",
+                        "name": "Centaurmaple",
+                        "description": "It is good to stop by the track for a space, put aside the knapsack, wipe the brows, and talk a little of the upper slopes of the mountain we think we are climbing, would but the trees let us see it.",
+                        "price": 615
+                    },
+                    {
+                        "id": "478877",
+                        "name": "Piraterhinestone",
+                        "description": "And with that he went off to see my father, taking me with him by the arm.",
+                        "price": 196
+                    }
+                ],
+                "ip": "0.0.0.0"
+            },
+            {
+                "id": "530053",
+                "name": "Shieldpatch",
+                "date": "744632",
+                "products": [
+                    {
+                        "id": "245214",
+                        "name": "Heroiris",
+                        "description": "It is good to stop by the track for a space, put aside the knapsack, wipe the brows, and talk a little of the upper slopes of the mountain we think we are climbing, would but the trees let us see it.",
+                        "price": 463
+                    },
+                    {
+                        "id": "534850",
+                        "name": "Crowmarble",
+                        "description": "I protest, even warmly, that neither he nor his sorrows were in my intention.",
+                        "price": 673
+                    },
+                    {
+                        "id": "411855",
+                        "name": "Zebrafortune",
+                        "description": "It was at this time that the meeting, or, rather gathering of the mem- bers of this inharmonious family took place in the cell of the elder who had such an extraordinary influence on Alyosha.",
+                        "price": 915
+                    },
+                    {
+                        "id": "298342",
+                        "name": "Falconcoconut",
+                        "description": "And with that he went off to see my father, taking me with him by the arm.",
+                        "price": 495
+                    },
+                    {
+                        "id": "568003",
+                        "name": "Koalablaze",
+                        "description": "Have I come to Utopia to hear this sort of thing?",
+                        "price": 873
+                    }
+                ],
+                "ip": "0.0.0.0"
+            },
+            {
+                "id": "842957",
+                "name": "Raptorthunder",
+                "date": "106101",
+                "products": [
+                    {
+                        "id": "387274",
+                        "name": "Cloudcoral",
+                        "description": "She stared at him in astonishment, and as she read something of the significant hieroglyphic of his battered face, her lips whitened.",
+                        "price": 575
+                    },
+                    {
+                        "id": "67822",
+                        "name": "Pegasusrust",
+                        "description": "He completely abandoned the child of his marriage with Adelaida Ivanovna, not from malice, nor because of his matrimoni- al grievances, but simply because he forgot him.",
+                        "price": 821
+                    },
+                    {
+                        "id": "211159",
+                        "name": "Eaglefan",
+                        "description": "She stared at him in astonishment, and as she read something of the significant hieroglyphic of his battered face, her lips whitened.",
+                        "price": 667
+                    },
+                    {
+                        "id": "630255",
+                        "name": "Apetwilight",
+                        "description": "I protest, even warmly, that neither he nor his sorrows were in my intention.",
+                        "price": 242
+                    },
+                    {
+                        "id": "173082",
+                        "name": "Gemrain",
+                        "description": "Have I come to Utopia to hear this sort of thing?",
+                        "price": 542
+                    }
+                ],
+                "ip": "0.0.0.0"
+            }
+        ]
+    }
+}
 ```
 
 Keep reading for in-depth information of how to deploy the demo services.
