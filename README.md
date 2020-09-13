@@ -172,7 +172,7 @@ Note that this proto file is *importing* `google/api/annotations.proto` to annot
 
 So, to create a new User using HTTP you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` from `/v1/user/{id}`.
 
-HTTP transcoding is not required in gRPC but it lets you mix gRPC with RESTful services. In this demo it lets us use simple `curl` commands for testing the services. Note that there is a [`grpcurl`](https://github.com/fullstorydev/grpcurl) tool too.
+HTTP transcoding is not required in gRPC but it lets you mix gRPC with RESTful services. In this demo it lets you use simple `curl` commands for testing the services. Note that there is a [`grpcurl`](https://github.com/fullstorydev/grpcurl) tool too.
 
 This is the *Account* proto file:
 
