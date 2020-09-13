@@ -85,17 +85,15 @@ It works across languages and platforms and it is increasingly being used in hig
 
 gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview) (*protobuf* files) to define the structure for the data you want to transfer.
 
-There are four services in this demo. All of them use gRPC to communicate with each other. They are all written in Go.
-
 ### Protocol Buffers
 
-Before diving into the services let examine the *protobuf* files that define all the *messages* used in this demo. There is a shared Git repository where all proto files are defined:
+Before diving into the code let examine the *protobuf* files that define the API used in this demo. There is a shared Git repository where all proto files are defined:
 
 - [grpc-demo-proto](https://github.com/drhelius/grpc-demo-proto)
 
-This Git repo stores the proto files for all the services in the demo. Some services (*Account* and *Order*) in this demo work like composites. This mean they will aggregate information from other services (*User* and *Product*). In order to do that they share some common types. Sharing a repo with all the proto files let you share types between different proto files easily.
+This Git repo stores the proto files for all the services in the demo. Some services (*Account* and *Order*) work like composites. This mean they will aggregate information from other services (*User* and *Product*). In order to do that they share some common types. Sharing a repo with all the proto files let you share types between different proto files easily.
 
-Sharing a Git repo for protos or creating a repo for each service is a difficult and hairy discussion. This demo will stick with only one repo for simplicity.
+If you need to share data types, sharing a Git repo for all services or creating a repo for each service is a difficult and hairy decision. This demo will stick with a single repo approach for simplicity.
 
 There is a directory for each service in the repo. In each directory there is a proto file describing the data types that will be used in the service. This is the *User* proto file:
 
@@ -150,7 +148,7 @@ The `Read` *method* uses the `ReadUserReq` message as input and `ReadUserResp` a
 
 The type or *message* `User` is defined as a group of three strings, *id*, *name* and *email*.
 
-So the Read *method* expects a user ID and returns the user data.
+In summary, the `Read` *method* expects a user ID and returns the user data.
 
 Note that this proto file is *importing* `google/api/annotations.proto` to annotate each *method* in the service with `option (google.api.http)`. This annotation let you [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) and vice versa, so that clients can access your gRPC API by using HTTP/JSON:
 
