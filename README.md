@@ -84,7 +84,7 @@ gRPC is a framework to connect services by using *Remote Procedure Calls*, this 
 
 It works across languages and platforms and it is increasingly being used in high performance environments. Its protocol can achieve bi-directional streaming with HTTP2 based transport.
 
-gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview) or *protobuf files* to define the structure for the data you want to transfer.
+gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview) (*protobuf* files) to define the structure for the data you want to transfer.
 
 There are four services in this demo. All of them use gRPC to communicate wit each other. They are all written in Go.
 
