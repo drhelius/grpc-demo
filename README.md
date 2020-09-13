@@ -76,6 +76,8 @@ Note that, for simplicity, the operator is only provided for deploying the demo 
 
 You can have the services deployed both with Istio and without it at the same time but you may want to deploy them in different namespaces.
 
+All three deployment methods will create the necessary Kubernetes resources to run all four microservices. These resources are `Deployments`, `Services` and `Routes`. If you are running the demo with Istio, they will also create `VirtualServices`, `DestinationRules`, `Gateways` and `ServiceEntries`.
+
 ## 3 - gRPC services in Go
 
 TODO
@@ -204,7 +206,7 @@ Once you have developed a Helm Chart you can make a package and create a Helm re
 
 Helm repositories are simple web servers that host tgz files. Each chart is distributed as a compressed tgz file. In addition to the charts you need an `index.yaml`. This index will contain the information of the charts in the Helm repo.
 
-In this demo, the Helm repo is provided by using [GitHub Pages](https://pages.github.com/). GitHub let you use a directory in your git repository to store web content. We can use this directory to store some charts and the `index.yaml` file.
+In this demo, the Helm repo is provided by using [GitHub Pages](https://pages.github.com/). GitHub let you use a directory in your git repository to store web content. You can use this directory to store some charts and the `index.yaml` file.
 
 This is the URL for the GitHub pages in this git repo: <https://drhelius.github.io/grpc-demo/>
 
@@ -244,7 +246,7 @@ Use it to create the Member Roll:
 
 `$ kubectl apply -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
 
-We are going to use the [provided Helm Chart](helm-charts/grpc-demo-services-istio/Chart.yaml) for deploying the services using Istio.
+In this example you are going to use the [provided Helm Chart](helm-charts/grpc-demo-services-istio/Chart.yaml) for deploying the services using Istio.
 
 Make sure you are working with the right namespace:
 
@@ -360,7 +362,7 @@ Create a project to deploy the demo services if you haven't done so:
 
 `$ oc new-project grpc-demo`
 
-We are going to use the [provided Helm Chart](helm-charts/grpc-demo-services/Chart.yaml) for deploying the services without using Istio.
+In this example you are going to use the [provided Helm Chart](helm-charts/grpc-demo-services/Chart.yaml) for deploying the services without using Istio.
 
 Make sure you are working with the right namespace:
 
@@ -495,7 +497,31 @@ These templates deploy all four services at once. This is convenient for this de
 
 The templates define all the manifests needed in order to get the services deployed and running.
 
-Parameters allow you to configure each service image, version, replicas and resources.
+Parameters allow you to configure each service image, version, replicas and resources:
+
+```yaml
+...
+
+parameters:
+- description: Sets the Application name.
+  name: APP_NAME
+  displayName: Application name
+  value: grpc-demo
+- description: Sets the Account Service image.
+  name: ACCOUNT_IMAGE
+  displayName: Account Service image
+  value: quay.io/isanchez/grpc-demo-account
+- description: Sets the Account Service version.
+  name: ACCOUNT_VERSION
+  displayName: Account Service version
+  value: v1.0.0
+- description: Specifies how many instances of the Account Service to create in the cluster.
+  name: ACCOUNT_REPLICAS
+  displayName: Account Service replicas
+  value: "1"
+
+...
+```
 
 The `APP_NAME` parameter is just an identifier to label all the manifests created by the templates and organize the view in the [OpenShift Developer Console](https://developers.redhat.com/blog/2019/10/16/openshift-developer-perspective/).
 
@@ -515,7 +541,7 @@ Use it to create the Member Roll:
 
 `$ oc apply -f openshift-service-mesh/service-mesh-member-roll.yaml -n istio-system`
 
-We are going to use the [provided OpenShift template](openshift-templates/grpc-demo-template-istio.yaml) for deploying the services using Istio.
+In this example you are going to use the [provided OpenShift template](openshift-templates/grpc-demo-template-istio.yaml) for deploying the services using Istio.
 
 Make sure you are working with the right namespace:
 
@@ -587,7 +613,7 @@ Create a project to deploy the demo services if you haven't done so:
 
 `$ oc new-project grpc-demo`
 
-We are going to use the [provided OpenShift Template](openshift-templates/grpc-demo-template.yaml) for deploying the services without using Istio.
+In this example you are going to use the [provided OpenShift Template](openshift-templates/grpc-demo-template.yaml) for deploying the services without using Istio.
 
 Make sure you are working with the right namespace:
 
@@ -682,7 +708,7 @@ Recommended reads before proceeding:
 
 - Install the Operator SDK following the [official docs](https://sdk.operatorframework.io/docs/installation/install-operator-sdk/).
 
-- Create a new project. Note that we use `example.com` to group our CRDs, you may use whatever you wish:
+- Create a new project. Note that the example uses `example.com` to group the CRDs, you may use whatever you wish:
 
 ```bash
 $ mkdir -p $HOME/projects/grpc-demo-operator
@@ -690,13 +716,13 @@ $ cd $HOME/projects/grpc-demo-operator
 $ operator-sdk init --domain=example.com --repo=github.com/drhelius/grpc-demo-operator
 ```
 
-- Create a new Custom Resource Definition (CRD) with version `v1` and Kind `DemoServices`. This kind is the name of our new custom CRD, so you can choose a different name if you wish:
+- Create a new Custom Resource Definition (CRD) with version `v1` and Kind `DemoServices`. This kind is the name of your new custom CRD, so you can choose a different name if you wish:
 
 ```bash
 $ operator-sdk create api --group grpcdemo --version v1 --kind DemoServices --resource=true --controller=true
 ```
 
-- Now you can define the API. The Custom Resource (CR) in this demo defines the services we want to deploy and their resources. It looks like this:
+- Now you can define the API. The Custom Resource (CR) in this demo defines the services you want to deploy and their resources. It looks like this:
 
 ```yaml
 apiVersion: grpcdemo.example.com/v1
@@ -747,7 +773,7 @@ spec:
         cpu: "0.1"
 ```
 
-For each service defined in this CR, the operator will create a `Deployment`, a `Service` and `Route`. This will make each microservice available in our cluster to be consumed.
+For each service defined in this CR, the operator will create a `Deployment`, a `Service` and `Route`. This will make each microservice available in your cluster to be consumed.
 
 - The API for the CR is defined in the [`api/v1/demoservices_types.go`](https://github.com/drhelius/grpc-demo-operator/blob/master/api/v1/demoservices_types.go) file:
 
