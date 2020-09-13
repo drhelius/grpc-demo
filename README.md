@@ -239,9 +239,25 @@ The keyword `repeated` indicates that the `orders` field can be repeated any num
 
 ### Go Implementation
 
+All four services are implemented in the same way.
+
+In `main.go` two goroutines are created for both serving gRPC and HTTP:
+
+```go
+func main() {
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go grpc.Serve(&wg, "5000")
+
+	wg.Add(1)
+	go http.Serve(&wg, "5000", "8080")
+
+	wg.Wait()
+}
+```
 
 https://github.com/grpc-ecosystem/grpc-gateway
-
 
 ### Testing the Services
 
@@ -257,6 +273,8 @@ For your reference, a response from the `Read` operation in the *Account* looks 
 
 ```json
 ```
+
+Keep reading for in-depth information of how to deploy the demo services.
 
 ## 4 - Istio Service Mesh in OpenShift
 
