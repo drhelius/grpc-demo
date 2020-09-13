@@ -86,11 +86,11 @@ It works across languages and platforms and it is increasingly being used in hig
 
 gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs/overview) (*protobuf* files) to define the structure for the data you want to transfer.
 
-There are four services in this demo. All of them use gRPC to communicate wit each other. They are all written in Go.
+There are four services in this demo. All of them use gRPC to communicate with each other. They are all written in Go.
 
 ### Protocol Buffers
 
-Before diving into the services let examine the *protobuf* files that define all the messages and types used in this demo. There is a shared Git repository where all proto files are defined:
+Before diving into the services let examine the *protobuf* files that define all the *messages* used in this demo. There is a shared Git repository where all proto files are defined:
 
 - [grpc-demo-proto](https://github.com/drhelius/grpc-demo-proto)
 
@@ -149,11 +149,11 @@ In this proto file a service called `UserService` is described. The service has 
 
 The `Read` operation uses the `ReadUserReq` message as input and `ReadUserResp` as output. `ReadUserReq` is defined as a simple data structure with a single string that represents the User *id*. `ReadUserResp` is defined with a field called *user* of type `User`.
 
-The type or *message* `User` is defined as group of three strings, *id*, *name* and *email*.
+The type or *message* `User` is defined as a group of three strings, *id*, *name* and *email*.
 
 So the Read operation expects a User ID and returns the User data.
 
-Note that this proto file is *importing* `google/api/annotations.proto`. This make it possible to annotate each operation in the service with the `option` keyword to [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) an viceversa, so that clients can access your gRPC API by using HTTP/JSON:
+Note that this proto file is *importing* `google/api/annotations.proto` to annotate each operation in the service with `option (google.api.http)`. This annotation let you [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) and viceversa, so that clients can access your gRPC API by using HTTP/JSON:
 
 ```proto
 ...
@@ -170,9 +170,9 @@ Note that this proto file is *importing* `google/api/annotations.proto`. This ma
 ...
 ```
 
-So, to create a User using HTTP you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` from `/v1/user/{id}`.
+So, to create a new User using HTTP you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` from `/v1/user/{id}`.
 
-HTTP transcoding is not required in gRPC but provides an useful integration mechanism to interconnect gRPC with HTTP services.
+HTTP transcoding is not required in gRPC but it lets you mix gRPC with RESTful services. In this demo it lets us use simple `curl` commands for testing the services. Note that there is a [`grpcurl`](https://github.com/fullstorydev/grpcurl) tool too.
 
 This is the *Account* proto file:
 
