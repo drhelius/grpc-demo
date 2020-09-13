@@ -88,6 +88,8 @@ gRPC uses [Protocol Buffers](https://developers.google.com/protocol-buffers/docs
 
 There are four services in this demo. All of them use gRPC to communicate wit each other. They are all written in Go.
 
+### Protocol Buffers
+
 Before diving into the services let examine the *protobuf* files that define all the messages and types used in this demo. There is a shared Git repository where all proto files are defined:
 
 - [grpc-demo-proto](https://github.com/drhelius/grpc-demo-proto)
@@ -151,7 +153,7 @@ The type or *message* `User` is defined as group of three strings, *id*, *name* 
 
 So the Read operation expects a User ID and returns the User data.
 
-Note that this proto file is *importing* `google/api/annotations.proto`. This make it possible to annotate each operation in the service with the `option` keyword to transcode HTTP to gRPC an viceversa, so that clients can access your gRPC API by using HTTP/JSON:
+Note that this proto file is *importing* `google/api/annotations.proto`. This make it possible to annotate each operation in the service with the `option` keyword to [transcode HTTP to gRPC](https://cloud.google.com/endpoints/docs/grpc/transcoding) an viceversa, so that clients can access your gRPC API by using HTTP/JSON:
 
 ```proto
 ...
@@ -165,13 +167,88 @@ Note that this proto file is *importing* `google/api/annotations.proto`. This ma
         option (google.api.http) = {
             get: "/v1/user/{id}"
         };
+...
 ```
 
-So, to create a User you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` to `/v1/user/{id}`.
+So, to create a User using HTTP you will `POST` the JSON data to `/v1/user`. For reatrieving User data you will `GET` from `/v1/user/{id}`.
 
+HTTP transcoding is not required in gRPC but provides an useful integration mechanism to interconnect gRPC with HTTP services.
+
+This is the *Account* proto file:
+
+```proto
+syntax = "proto3";
+option go_package = "github.com/drhelius/grpc-demo-proto/account";
+
+package account;
+
+import "google/api/annotations.proto";
+import "user/user.proto";
+import "order/order.proto";
+
+service AccountService {
+    rpc Create (CreateAccountReq) returns (CreateAccountResp) {
+        option (google.api.http) = {
+            post: "/v1/account"
+            body: "account"
+        };
+    }
+    rpc Read (ReadAccountReq) returns (ReadAccountResp) {
+        option (google.api.http) = {
+            get: "/v1/account/{id}"
+        };
+    }
+}
+
+message Account {
+    string id = 1;
+    user.User user = 2;
+    repeated order.Order orders = 3;
+}
+
+message CreateAccountReq {
+    Account account = 1;
+}
+
+message CreateAccountResp {
+    string id = 1;
+}
+
+message ReadAccountReq {
+    string id = 1;
+}
+
+message ReadAccountResp {
+    Account account = 1;
+}
+```
+
+Note that it uses more imports: `user/user.proto` and `order/order.proto`. Importing other proto files let you use the *messages* defined in those files.
+
+The *Account* service aggregates information about the user and the orders made:
+
+```proto
+message Account {
+    string id = 1;
+    user.User user = 2;
+    repeated order.Order orders = 3;
+}
+```
+
+The keyword `repeated` indicates that the `orders` field can be repeated any number of times (including zero).
+
+### Go Implementation
 
 
 https://github.com/grpc-ecosystem/grpc-gateway
+
+
+### Testing the Services
+
+For your reference, a response from the `Read` operation in the *Account* looks like this (in JSON):
+
+```json
+```
 
 
 ## 4 - Istio Service Mesh in OpenShift
