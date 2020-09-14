@@ -16,6 +16,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 1. [Components](#1---components)
 2. [Architecture](#2---architecture)
+    - [Demo API](#demo-api)
 3. [gRPC services in Go](#3---grpc-services-in-go)
     - [Protocol Buffers](#protocol-buffers)
     - [Go Implementation](#go-implementation)
