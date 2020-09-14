@@ -1567,14 +1567,14 @@ prometheus                      prometheus-istio-system.apps.mycluster.com      
 
 Login into Kiali console and select the `grpc-demo-istio` namespace:
 
-<img align="center" src="images/kiali4.png">
+<img align="middle" src="images/kiali4.png" alt="Kiali namespace selection">
 
 You can choose between different types of graphs:
 
-![Kiali graph selection](images/kiali5.png "Kiali graph selection")
+<img align="middle" src="images/kiali5.png" alt="Kiali graph selection">
 
 And you can select what is displayed in the graphs:
 
-![Kiali display selection](images/kiali6.png "Kiali display selection")
+<img align="middle" src="images/kiali6.png" alt="Kiali display selection">
 
-![Service Mesh observability](images/kiali3.png "Service Mesh observability")
+<img align="middle" src="images/kiali3.png" alt="Service Mesh observability">
