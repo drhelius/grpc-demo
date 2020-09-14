@@ -576,7 +576,9 @@ In order to install OpenShift Service Mesh you should go through the steps expla
 
 Istio in OpenShift is installed by running a set of operators. Before installing the Red Hat Service Mesh operator you have to install the Elasticsearch, Jaeger and Kiali operators, in this order.
 
-![Red Hat Service Mesh Operators](images/operators.png "Red Hat Service Mesh Operators")
+<p align="center">
+  <img src="images/operators.png" alt="Red Hat Service Mesh Operators"/>
+</p>
 
 ### Install Elasticsearch Operator
 
