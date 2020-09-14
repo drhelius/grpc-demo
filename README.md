@@ -583,7 +583,7 @@ For your reference, the *Account* service `Read` method response looks similar t
 }
 ```
 
-Keep reading for in-depth information of how to deploy the demo services.
+Keep reading for in-depth information about how to deploy the demo services.
 
 ## 4 - Istio Service Mesh in OpenShift
 
