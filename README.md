@@ -51,7 +51,9 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 ## 2 - Architecture
 
-![Demo Services](images/architecture.png "Demo Services")
+<p align="center">
+  <img src="images/architecture.png" alt="Demo Services"/>
+</p>
 
 This demo is composed of four microservices modeling how a customer buy products in an eCommerce:
 
@@ -640,7 +642,9 @@ prometheus               1/1     1            1           41d
 
 ## 5 - Helm Charts
 
-![Helm Release](images/helm.png "Helm Release")
+<p align="center">
+  <img src="images/helm.png" alt="Helm Release"/>
+</p>
 
 Helm Charts are an easy and powerful tool for deploying your services.
 
@@ -970,7 +974,9 @@ OpenShift Templates are a simple tool to deploy services and apply parameterized
 
 Unfortunately, these templates lack the dynamism (loops and conditionals) often used to achieve complex deployments. This usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
 
-![Demo Templates](images/templates.png "Demo Templates")
+<p align="center">
+  <img src="images/templates.png" alt="Demo Templates"/>
+</p>
 
 Two templates are provided in this repo for deploying the demo services both with Istio and without it:
 
@@ -1164,7 +1170,9 @@ You can uninstall everything by running:
 
 ## 7 - Kubernetes Operators
 
-![Deploying with operator](images/architecture_operator.png "Deploying with operator")
+<p align="center">
+  <img src="images/architecture_operator.png" alt="Deploying with a Kubernetes Operator"/>
+</p>
 
 In this demo, a Kubernetes Operator is provided in order to deploy all four services at once:
 
