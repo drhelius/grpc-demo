@@ -83,6 +83,9 @@ All three deployment methods will create the necessary Kubernetes resources to r
 ### Demo API
 
 ![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
+<p align="center">
+  <img src="images/kiali2.png" alt="Service Mesh architecture" width="500"/>
+</p>
 
 #### Account Service
       
