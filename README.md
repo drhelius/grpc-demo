@@ -52,9 +52,9 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
   
 ### Requirements
 
-Go | Istio | Helm
---- | --- | ---
-1.13+ | 1.4+ | 3.2.0+
+Kubernetes | Istio | Helm | Go
+--- | --- | --- | ---
+1.13+ | 1.4+ | 3.2.0+ | 1.13+
 
 ## 2 - Architecture
 
