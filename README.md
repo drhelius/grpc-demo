@@ -15,6 +15,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 ## Index
 
 1. [Components](#1---components)
+    - [Requirements](#requirements)
 2. [Architecture](#2---architecture)
     - [Demo API](#demo-api)
 3. [gRPC services in Go](#3---grpc-services-in-go)
@@ -48,6 +49,12 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
   - [Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator)
 - Istio
   - [Service Mesh Control Plane](openshift-service-mesh)
+  
+### Requirements
+
+Go | Istio | Helm
+--- | --- | ---
+1.13+ | 1.4+ | 3.2.0+
 
 ## 2 - Architecture
 
