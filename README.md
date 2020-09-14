@@ -77,6 +77,96 @@ You can have the services deployed both with Istio and without it at the same ti
 
 All three deployment methods will create the necessary Kubernetes resources to run all four microservices. These resources are `Deployments`, `Services` and `Routes`. If you are running the demo with Istio, they will also create `VirtualServices`, `DestinationRules`, `Gateways` and `ServiceEntries`.
 
+### Demo API
+
+![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
+
+#### Account Service
+      
+The *Account* service is the entry point. It aggregates data from *User* and *Order* services. When you query the *Account* service it calls *User* and *Order* services under the hood. It represents an user account with personal information and past orders.
+
+- Account
+  - Create
+    - Request:
+      - string id: The account ID
+      - User user: The user data
+      - Order Array orders: List of orders made
+    - Response:
+      - string id: The new created account ID
+  - Read
+    - Request:
+      - string id: The account ID
+    - Response:
+      - string id: The account ID
+      - User user: The user data
+      - Order Array orders: List of orders made
+     
+#### Order Service
+
+The *Order* service simulates a collection of products purchased at the same time. When you query the *Order* service it calls *Product* service under the hood.
+ 
+- Order
+  - Create
+    - Request:
+      - string id: The order ID
+      - string name: A name for the order
+      - int date: The date when order was made
+      - Product Array: List of purchased products
+      - string ip: Public IP collected during the purchase, just for testing httpbin.org    
+    - Response:
+      - string id: The new created order ID
+  - Read
+    - Request:
+      - string id: The order ID
+    - Response:
+      - string id: The order ID
+      - string name: A name for the order
+      - int date: The date when order was made
+      - Product Array: List of purchased products
+      - string ip: Public IP collected during the purchase, just for testing httpbin.org
+     
+#### Product Service
+
+The *Product* service is just a representation of a single product information.
+
+- Product
+  - Create
+    - Request:
+      - string id: The product ID
+      - string name: Product name
+      - string description: Product description
+      - int price: Product price
+    - Response:
+      - string id: The new created product ID
+  - Read
+    - Request:
+      - string id: The product ID
+    - Response:
+      - string id: The product ID
+      - string name: Product name
+      - string description: Product description
+      - int price: Product price
+
+#### User Service
+
+The *User* service simulates personal information data.
+
+- User
+  - Create
+    - Request:
+      - string id: The user ID
+      - string name: User name
+      - string email: User email
+    - Response:
+      - string id: The new created user ID
+  - Read
+    - Request:
+      - string id: The user ID
+    - Response:
+      - string id: The user ID
+      - string name: User name
+      - string email: User email
+      
 ## 3 - gRPC services in Go
 
 gRPC is a framework to connect services by using *Remote Procedure Calls*, this means that a client application can directly call a method on a server application on a different machine as if it were a local object.
