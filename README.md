@@ -1559,7 +1559,9 @@ demoservices.grpcdemo.example.com "example-services" deleted
 
 ## 8 - Observability with Kiali
 
-![Service Mesh architecture](images/kiali2.png "Service Mesh architecture")
+<p align="center">
+  <img src="images/kiali2.png" alt="Service Mesh architecture" width="600"/>
+</p>
 
 Once you have Istio and the demo services up and running you can observe what is going on in your mesh with Kiali.
 
