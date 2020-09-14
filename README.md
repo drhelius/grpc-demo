@@ -1567,7 +1567,7 @@ prometheus                      prometheus-istio-system.apps.mycluster.com      
 
 Login into Kiali console and select the `grpc-demo-istio` namespace:
 
-![Kiali namespace selection](images/kiali4.png "Kiali namespace selection")
+<img align="center" src="images/kiali4.png">
 
 You can choose between different types of graphs:
 
