@@ -15,6 +15,9 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 ## Index
 
 1. [Components](#1---components)
+    - [Microservices](#microservices)
+    - [Deployment Alternatives](#deployment-alternatives)
+    - [Istio](#istio)
     - [Requirements](#requirements)
 2. [Architecture](#2---architecture)
     - [Demo API](#demo-api)
@@ -37,17 +40,22 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 ## 1 - Components
 
-- Services
+### Microservices
+
   - [Protobuf Repo](https://github.com/drhelius/grpc-demo-proto)
   - [Account Service](https://github.com/drhelius/grpc-demo-account)
   - [Order Service](https://github.com/drhelius/grpc-demo-order)
   - [Product Service](https://github.com/drhelius/grpc-demo-product)
   - [User Service](https://github.com/drhelius/grpc-demo-user)
-- Deployment
+
+### Deployment Alternatives
+
   - [Helm Charts](helm-charts)
   - [OpenShift Templates](openshift-templates)
   - [Kubernetes Operator](https://github.com/drhelius/grpc-demo-operator)
-- Istio
+
+### Istio
+
   - [Service Mesh Control Plane](openshift-service-mesh)
   
 ### Requirements
