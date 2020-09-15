@@ -491,7 +491,9 @@ func init() {
 		PermitWithoutStream: true,
 	}
 
-	conn, err := grpc.Dial("user:5000", grpc.WithInsecure(), grpc.WithBlock(), grpc.FailOnNonTempDialError(true), grpc.WithKeepaliveParams(keepAliveParams))
+	conn, err := grpc.Dial("user:5000", grpc.WithInsecure(), grpc.WithBlock(), grpc.FailOnNonTempDialError(true), grpc.WithKeepaliveParams(keepAliveParams), grpc.WithStreamInterceptor(
+		grpc_opentracing.StreamClientInterceptor(
+			grpc_opentracing.WithTracer(opentracing.GlobalTracer()))))
 	if err != nil {
 		log.Fatalf("[Account] Error dialing to User service: %v", err)
 	}
