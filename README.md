@@ -732,7 +732,12 @@ $ helm package helm-charts/grpc-demo-services
 $ helm package helm-charts/grpc-demo-services-istio
 ```
 
-The output will be a tgz file for each chart. Put these tgz files in the same directory. In this same directory you are going to generate the `index.yaml` file too.
+The output will be a tgz file for each chart. Put these tgz files in the same directory:
+
+```bash
+$ mv grpc-demo-services-*.tgz docs/
+```
+In this same directory you are going to generate the `index.yaml` file too.
 
 Run the following command to create the index. Specify the directory where the tgz files are located and the URL where you are expecting to publish the Helm repo. It will read the directory and generate an index file based on the charts found:
 
