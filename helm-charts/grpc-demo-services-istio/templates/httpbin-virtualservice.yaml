@@ -19,7 +19,7 @@ spec:
     - gateways:
       - mesh
       port: 443
-      sni_hosts:
+      sniHosts:
       - httpbin.org
     route:
     - destination:
@@ -30,7 +30,7 @@ spec:
     - gateways:
       - httpbin
       port: 443
-      sni_hosts:
+      sniHosts:
       - httpbin.org
     route:
     - destination:

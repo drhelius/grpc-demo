@@ -632,7 +632,7 @@ objects:
       - gateways:
         - mesh
         port: 443
-        sni_hosts:
+        sniHosts:
         - httpbin.org
       route:
       - destination:
@@ -643,7 +643,7 @@ objects:
       - gateways:
         - httpbin
         port: 443
-        sni_hosts:
+        sniHosts:
         - httpbin.org
       route:
       - destination:
