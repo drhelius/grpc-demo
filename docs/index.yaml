@@ -2,7 +2,28 @@ apiVersion: v1
 entries:
   grpc-demo-services:
   - apiVersion: v2
-    created: "2020-09-15T15:16:48.075410017+02:00"
+    created: "2021-06-09T12:08:27.872846615+02:00"
+    description: A group of interconnected GRPC demo services written in Go.
+    digest: 0da688e519dcce12fe1922a9504cfe7fe0873e0bedfcf820da0869f02585f257
+    home: https://github.com/drhelius/grpc-demo
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
+    keywords:
+    - go
+    - grpc
+    - demo
+    - service
+    maintainers:
+    - email: isanchez@redhat.com
+      name: Ignacio Sánchez
+      url: https://twitter.com/drhelius
+    name: grpc-demo-services
+    sources:
+    - https://github.com/drhelius/grpc-demo
+    urls:
+    - https://drhelius.github.io/grpc-demo/grpc-demo-services-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v2
+    created: "2021-06-09T12:08:27.87224761+02:00"
     description: A group of interconnected GRPC demo services written in Go.
     digest: 8c1cf265c10a52fdb1c6aa96940bc41b76be586f00f9e73715aecae925e2b501
     home: https://github.com/drhelius/grpc-demo
@@ -24,7 +45,30 @@ entries:
     version: 1.0.0
   grpc-demo-services-istio:
   - apiVersion: v2
-    created: "2020-09-15T15:16:48.076313298+02:00"
+    created: "2021-06-09T12:08:27.876262685+02:00"
+    description: A group of interconnected GRPC demo services written in Go that run
+      on OpenShift Service Mesh.
+    digest: 1837ca9e8f7233752f4b61c34f3bf23a9be3645ac8f64df543b7835a43204eef
+    home: https://github.com/drhelius/grpc-demo
+    icon: https://raw.githubusercontent.com/openshift/console/master/frontend/public/imgs/logos/golang.svg
+    keywords:
+    - go
+    - grpc
+    - demo
+    - service
+    - istio
+    maintainers:
+    - email: isanchez@redhat.com
+      name: Ignacio Sánchez
+      url: https://twitter.com/drhelius
+    name: grpc-demo-services-istio
+    sources:
+    - https://github.com/drhelius/grpc-demo
+    urls:
+    - https://drhelius.github.io/grpc-demo/grpc-demo-services-istio-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v2
+    created: "2021-06-09T12:08:27.87554356+02:00"
     description: A group of interconnected GRPC demo services written in Go that run
       on OpenShift Service Mesh.
     digest: 39c826db0135bc8b2dd6ea378d3f1fc8f505edb0528255108de78b1e0ddbe958
@@ -47,7 +91,7 @@ entries:
     - https://drhelius.github.io/grpc-demo/grpc-demo-services-istio-1.0.1.tgz
     version: 1.0.1
   - apiVersion: v2
-    created: "2020-09-15T15:16:48.075909473+02:00"
+    created: "2021-06-09T12:08:27.874582035+02:00"
     description: A group of interconnected GRPC demo services written in Go that run
       on OpenShift Service Mesh.
     digest: 996695cad18eeb4beae3eb48bda97f2cc8f3e4ff385c209d37c4c5bd9d0151e6
@@ -69,4 +113,4 @@ entries:
     urls:
     - https://drhelius.github.io/grpc-demo/grpc-demo-services-istio-1.0.0.tgz
     version: 1.0.0
-generated: "2020-09-15T15:16:48.074824424+02:00"
+generated: "2021-06-09T12:08:27.871075601+02:00"

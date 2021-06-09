@@ -62,7 +62,7 @@ All the examples are provided for Red Hat OpenShift but could be applied to any 
 
 Kubernetes | Istio | Helm | Go
 --- | --- | --- | ---
-1.13+ | 1.4+ | 3.2.0+ | 1.13+
+1.13+ | 1.6+ | 3.2.0+ | 1.13+
 
 ## 2 - Architecture
 
@@ -649,20 +649,14 @@ Istio operator will then create all the deployments that conform the control pla
 
 ```bash
 $ kubectl get deployments -n istio-system
-NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
-grafana                  1/1     1            1           41d
-ior                      1/1     1            1           41d
-istio-citadel            1/1     1            1           41d
-istio-egressgateway      1/1     1            1           41d
-istio-galley             1/1     1            1           41d
-istio-ingressgateway     1/1     1            1           41d
-istio-pilot              1/1     1            1           41d
-istio-policy             1/1     1            1           41d
-istio-sidecar-injector   1/1     1            1           41d
-istio-telemetry          1/1     1            1           41d
-jaeger                   1/1     1            1           41d
-kiali                    1/1     1            1           15d
-prometheus               1/1     1            1           41d
+NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
+grafana                1/1     1            1           4m1s
+istio-egressgateway    1/1     1            1           4m6s
+istio-ingressgateway   1/1     1            1           4m8s
+istiod-basic           1/1     1            1           5m2s
+jaeger                 1/1     1            1           4m9s
+kiali                  1/1     1            1           2m6s
+prometheus             1/1     1            1           4m29s
 ```
 
 ## 5 - Helm Charts
