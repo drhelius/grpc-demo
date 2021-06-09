@@ -593,7 +593,7 @@ Keep reading for in-depth information about how to deploy the demo services.
 
 ## 4 - Istio Service Mesh in OpenShift
 
-In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
+In order to install OpenShift Service Mesh you should go through the steps explained in the [official docs](https://docs.openshift.com/container-platform/4.7/service_mesh/service_mesh_install/preparing-ossm-installation.html). The following is a simplified guide.
 
 Istio in OpenShift is installed by running a set of operators. Before installing the Red Hat Service Mesh operator you have to install the Elasticsearch, Jaeger and Kiali operators, in this order.
 
@@ -603,7 +603,7 @@ Istio in OpenShift is installed by running a set of operators. Before installing
 
 ### Install Elasticsearch Operator
 
-- Update Channel: 4.5
+- Update Channel: 4.7
 - Installation Mode: All namespaces
 - Installed Namespace: openshift-operators
 - Approval Strategy: Automatic
@@ -750,7 +750,7 @@ Create a project to deploy the demo services if you haven't done so:
 
 `$ oc new-project grpc-demo-istio`
 
-Create the service mesh [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm) if you haven't done so. This will tell Istio to start monitoring the namespaces specified.
+Create the service mesh [Member Roll](https://docs.openshift.com/container-platform/4.7/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm) if you haven't done so. This will tell Istio to start monitoring the namespaces specified.
 
 A Service Mesh Member Roll manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio` namespace. If you are using a different name for the project you should change it accordingly.
 
@@ -807,7 +807,7 @@ maintainers:
 name: grpc-demo-services-istio
 sources:
 - https://github.com/drhelius/grpc-demo
-version: 1.0.0
+version: 2.0.0
 ```
 
 The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services-istio/values.yaml) for all the parameters:
@@ -921,7 +921,7 @@ maintainers:
 name: grpc-demo-services
 sources:
 - https://github.com/drhelius/grpc-demo
-version: 1.0.0
+version: 2.0.0
 ```
 
 The chart can be parameterized. These are the [default values](helm-charts/grpc-demo-services/values.yaml) for all the parameters:
@@ -965,7 +965,7 @@ Install the chart:
 After a few minutes the services should be up an running:
 
 ```bash
-$ oc get deployments
+$ kubectl get deployments
 NAME             READY   UP-TO-DATE   AVAILABLE   AGE
 account-v1.0.0   1/1     1            1           3m1s
 order-v1.0.0     1/1     1            1           3m1s
@@ -976,7 +976,7 @@ user-v1.0.0      1/1     1            1           3m1s
 An HTTP route for every service is automatically generated:
 
 ```bash
-$ oc get route
+$ kubectl get route
 NAME      HOST/PORT                                           PATH   SERVICES   PORT   TERMINATION   WILDCARD
 account   account-grpc-demo.apps.mycluster.com                 account    http                 None
 order     order-grpc-demo.apps.mycluster.com                   order      http                 None
@@ -996,7 +996,7 @@ You can uninstall everything by running:
     
 OpenShift Templates are a simple tool to deploy services and apply parameterized changes in your cluster. They are not available in other Kubernetes distributions but they are very convenient for simple scenarios if you are using OpenShift.
 
-Unfortunately, these templates lack the dynamism (loops and conditionals) often used to achieve complex deployments. This usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.5/openshift_images/using-templates.html) for additional information.
+Unfortunately, these templates lack the dynamism (loops and conditionals) often used to achieve complex deployments. This usually makes Helm a better option. Refer to the [official docs](https://docs.openshift.com/container-platform/4.7/openshift_images/using-templates.html) for additional information.
 
 <p align="center">
   <img src="images/templates.png" alt="Demo Templates"/>
@@ -1047,7 +1047,7 @@ Create a project to deploy the demo services if you haven't done so:
 
 `$ oc new-project grpc-demo-istio`
 
-Create the service mesh [Member Roll](https://docs.openshift.com/container-platform/4.5/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm) if you haven't done so. This will tell Istio to start monitoring the namespaces specified.
+Create the service mesh [Member Roll](https://docs.openshift.com/container-platform/7/service_mesh/service_mesh_install/installing-ossm.html#ossm-member-roll-create_installing-ossm) if you haven't done so. This will tell Istio to start monitoring the namespaces specified.
 
 A Service Mesh Member Roll manifest is [provided in this repo](openshift-service-mesh/service-mesh-member-roll.yaml). It includes the `grpc-demo-istio` namespace. If you are using a different name for the project you should change it accordingly.
 
