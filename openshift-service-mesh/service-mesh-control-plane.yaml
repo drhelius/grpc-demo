@@ -7,6 +7,9 @@ spec:
   tracing:
     type: Jaeger
     sampling: 10000
+  gateways:
+    openshiftRoute:
+      enabled: true
   addons:
     jaeger:
       name: jaeger

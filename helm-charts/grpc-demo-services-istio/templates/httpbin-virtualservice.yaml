@@ -19,18 +19,19 @@ spec:
     - gateways:
       - mesh
       port: 443
-      sni_hosts:
+      sniHosts:
       - httpbin.org
     route:
     - destination:
         host: istio-egressgateway.istio-system.svc.cluster.local
+        subset: httpbin
         port:
           number: 443
   - match:
     - gateways:
       - httpbin
       port: 443
-      sni_hosts:
+      sniHosts:
       - httpbin.org
     route:
     - destination:

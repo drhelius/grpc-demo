@@ -10,7 +10,7 @@ metadata:
   name: account
 spec:
   selector:
-    istio: ingressgateway
+    app: istio-ingressgateway
   servers:
   - hosts:
     - {{ .Values.account.route }}
