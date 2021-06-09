@@ -1,4 +1,4 @@
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   labels:
@@ -10,7 +10,7 @@ metadata:
   name: httpbin
 spec:
   selector:
-    istio: egressgateway
+    app: istio-egressgateway
   servers:
   - port:
       number: 443

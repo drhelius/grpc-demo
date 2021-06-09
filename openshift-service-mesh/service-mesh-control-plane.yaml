@@ -1,29 +1,23 @@
-apiVersion: maistra.io/v1
+apiVersion: maistra.io/v2
 kind: ServiceMeshControlPlane
 metadata:
-  name: basic-install
+  name: basic
 spec:
-  istio:
-    gateways:
-      istio-egressgateway:
-        autoscaleEnabled: false
-        ior_enabled: false
-      istio-ingressgateway:
-        autoscaleEnabled: false
-        ior_enabled: true
-    grafana:
+  version: v2.0
+  tracing:
+    type: Jaeger
+    sampling: 10000
+  gateways:
+    openshiftRoute:
       enabled: true
+  addons:
+    jaeger:
+      name: jaeger
+      install:
+        storage:
+          type: Memory
     kiali:
       enabled: true
-    mixer:
-      policy:
-        autoscaleEnabled: false
-      telemetry:
-        autoscaleEnabled: false
-    pilot:
-      autoscaleEnabled: false
-      traceSampling: 100
-    tracing:
+      name: kiali
+    grafana:
       enabled: true
-      jaeger:
-        template: all-in-one

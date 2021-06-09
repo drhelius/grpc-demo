@@ -1,6 +1,6 @@
 apiVersion: v2
 name: grpc-demo-services
-version: 1.0.0
+version: 2.0.0
 description: A group of interconnected GRPC demo services written in Go.
 keywords:
   - go
